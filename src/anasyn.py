@@ -36,6 +36,7 @@ def specifProgPrinc(lexical_analyser):
 	logger.debug("Name of program : "+ident)
 	
 def  corpsProgPrinc(lexical_analyser):
+	code.write("\ndebutProg\n")
 	if not lexical_analyser.isKeyword("begin"):
 		logger.debug("Parsing declarations")
 		partieDecla(lexical_analyser)
@@ -46,19 +47,18 @@ def  corpsProgPrinc(lexical_analyser):
 		logger.debug("Parsing instructions")
 		suiteInstr(lexical_analyser)
 		logger.debug("End of instructions")
-			
 	lexical_analyser.acceptKeyword("end")
+	code.write("finProg")
 	lexical_analyser.acceptFel()
 	logger.debug("End of program")
 	
 def partieDecla(lexical_analyser):
-        if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
-                listeDeclaOp(lexical_analyser)
-                if not lexical_analyser.isKeyword("begin"):
-                        listeDeclaVar(lexical_analyser)
-        
-        else:
-                listeDeclaVar(lexical_analyser)                
+	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
+		listeDeclaOp(lexical_analyser)
+	if not lexical_analyser.isKeyword("begin") :
+    		listeDeclaVar(lexical_analyser)
+	else:
+    		listeDeclaVar(lexical_analyser)                
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -159,16 +159,20 @@ def listeDeclaVar(lexical_analyser):
 
 def declaVar(lexical_analyser):
 	listeIdent(lexical_analyser)
+	code.write("reserver("+str(compteur+1)+")\n")
 	lexical_analyser.acceptCharacter(":")
 	logger.debug("now parsing type...")
 	nnpType(lexical_analyser)
 	lexical_analyser.acceptCharacter(";")
 
 def listeIdent(lexical_analyser):
+	global compteur
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("identifier found: "+str(ident))
-
+	global identifierTable
+	identifierTable.append(ident)
 	if lexical_analyser.isCharacter(","):
+		compteur += 1
 		lexical_analyser.acceptCharacter(",")
 		listeIdent(lexical_analyser)
 
@@ -194,9 +198,10 @@ def instr(lexical_analyser):
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
 		if lexical_analyser.isSymbol(":="):				
-			# affectation
+			code.write("empiler("+str(tableIdentificateurs(ident))+")\n")
 			lexical_analyser.acceptSymbol(":=")
 			expression(lexical_analyser)
+			code.write("affectation\n")
 			logger.debug("parsed affectation")
 		elif lexical_analyser.isCharacter("("):
 			lexical_analyser.acceptCharacter("(")
@@ -212,6 +217,12 @@ def instr(lexical_analyser):
 	else:
 		logger.error("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
 		raise AnaSynException("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
+
+def tableIdentificateurs(ident):
+	for i in range (len(identifierTable)):
+		if (identifierTable[i] == ident):
+			return i
+	return -1
 
 def listePe(lexical_analyser):
 	expression(lexical_analyser)
@@ -237,39 +248,46 @@ def exp1(lexical_analyser):
         
 def exp2(lexical_analyser):
 	logger.debug("parsing exp2")
-        
 	exp3(lexical_analyser)
 	if	lexical_analyser.isSymbol("<") or \
 		lexical_analyser.isSymbol("<=") or \
 		lexical_analyser.isSymbol(">") or \
 		lexical_analyser.isSymbol(">="):
-		opRel(lexical_analyser)
+		op = opRel(lexical_analyser)
 		exp3(lexical_analyser)
+		code.write(str(op))
 	elif lexical_analyser.isSymbol("=") or \
 		lexical_analyser.isSymbol("/="): 
-		opRel(lexical_analyser)
+		op = opRel(lexical_analyser)
 		exp3(lexical_analyser)
+		code.write(str(op))
 	
 def opRel(lexical_analyser):
 	logger.debug("parsing relationnal operator: " + lexical_analyser.get_value())
         
 	if	lexical_analyser.isSymbol("<"):
 		lexical_analyser.acceptSymbol("<")
+		return "inf\n"
         
 	elif lexical_analyser.isSymbol("<="):
 		lexical_analyser.acceptSymbol("<=")
+		return "infeg\n"
         
 	elif lexical_analyser.isSymbol(">"):
 		lexical_analyser.acceptSymbol(">")
+		return "sup\n"
         
 	elif lexical_analyser.isSymbol(">="):
 		lexical_analyser.acceptSymbol(">=")
+		return "supeg\n"
         
 	elif lexical_analyser.isSymbol("="):
 		lexical_analyser.acceptSymbol("=")
+		return "egal\n"
         
 	elif lexical_analyser.isSymbol("/="):
 		lexical_analyser.acceptSymbol("/=")
+		return "diff\n"
         
 	else:
 		msg = "Unknown relationnal operator <"+ lexical_analyser.get_value() +">!"
@@ -280,16 +298,18 @@ def exp3(lexical_analyser):
 	logger.debug("parsing exp3")
 	exp4(lexical_analyser)	
 	if lexical_analyser.isCharacter("+") or lexical_analyser.isCharacter("-"):
-		opAdd(lexical_analyser)
+		op = opAdd(lexical_analyser)
 		exp4(lexical_analyser)
+		code.write(str(op)+"\n")
 
 def opAdd(lexical_analyser):
 	logger.debug("parsing additive operator: " + lexical_analyser.get_value())
 	if lexical_analyser.isCharacter("+"):
 		lexical_analyser.acceptCharacter("+")
-                
+		return ("add")
 	elif lexical_analyser.isCharacter("-"):
 		lexical_analyser.acceptCharacter("-")
+		return("sous")
                 
 	else:
 		msg = "Unknown additive operator <"+ lexical_analyser.get_value() +">!"
@@ -350,6 +370,8 @@ def elemPrim(lexical_analyser):
 		valeur(lexical_analyser)
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
+		code.write("empiler("+str(tableIdentificateurs(ident))+")\n")
+		code.write("valeurPile\n")
 		if lexical_analyser.isCharacter("("):			# Appel fonct
 			lexical_analyser.acceptCharacter("(")
 			if not lexical_analyser.isCharacter(")"):
@@ -369,6 +391,7 @@ def elemPrim(lexical_analyser):
 def valeur(lexical_analyser):
 	if lexical_analyser.isInteger():
 		entier = lexical_analyser.acceptInteger()
+		code.write("empiler("+str(entier)+")\n")
 		logger.debug("integer value: " + str(entier))
 		return "integer"
 	elif lexical_analyser.isKeyword("true") or lexical_analyser.isKeyword("false"):
@@ -420,25 +443,63 @@ def boucle(lexical_analyser):
 	logger.debug("end of while loop ")
 
 def altern(lexical_analyser):
+	sinon = False
 	logger.debug("parsing if: ")
 	lexical_analyser.acceptKeyword("if")
-
 	expression(lexical_analyser)
-       
+	code.write("tze\n")
+
+	lieu_tze = numero_ligne()
+
 	lexical_analyser.acceptKeyword("then")
 	suiteInstr(lexical_analyser)
 
 	if lexical_analyser.isKeyword("else"):
+		sinon = True
 		lexical_analyser.acceptKeyword("else")
+		code.write("tra\n")
+		lieu_tra = numero_ligne()
+		modif_ligne(lieu_tze, "tze("+str(lieu_tra+1)+")")
 		suiteInstr(lexical_analyser)
        
 	lexical_analyser.acceptKeyword("end")
+
+	lieu_end = numero_ligne()+1
+	if(sinon):
+		modif_ligne(lieu_tra, "tra("+str(lieu_end)+")")
+	else:
+		modif_ligne(lieu_tze, "tze("+str(lieu_end)+")")
 	logger.debug("end of if")
 
 def retour(lexical_analyser):
 	logger.debug("parsing return instruction")
 	lexical_analyser.acceptKeyword("return")
 	expression(lexical_analyser)
+
+def numero_ligne():
+	global code
+	code.close()
+	code_r = open("tests/code.txt", 'r')
+	code_entier=code_r.read()
+	lignes = code_entier.split("\n")
+	ligne = len(lignes)-2
+	code_r.close()
+	code = open("tests/code.txt", 'a')
+	return ligne
+
+def modif_ligne(ligne, texte):
+	global code
+	code.close()
+	code_r = open("tests/code.txt", 'r')
+	code_entier=code_r.read()
+	lignes = code_entier.split("\n")
+	lignes[int(ligne)] = str(texte)
+	code_r.close()
+	code = open("tests/code.txt", 'w')
+	for i in range (len(lignes)-1):
+		code.write(str(lignes[i])+"\n")
+
+
 
 	
 
@@ -457,6 +518,7 @@ def main():
 	parser.add_argument('--show-ident-table', action='store_true', \
                 help='shows the final identifiers table')
 	args = parser.parse_args()
+
 
 	filename = args.inputfile[0]
 	f = None
@@ -498,7 +560,7 @@ def main():
 		
 	if args.show_ident_table:
 			print("------ IDENTIFIER TABLE ------")
-			#print(str(identifierTable))
+			print(str(identifierTable))
 			print("------ END OF IDENTIFIER TABLE ------")
 
 
@@ -520,7 +582,13 @@ def main():
 	if outputFilename != "":
 			output_file.close() 
 
-########################################################################				 
+	code.close()
+
+########################################################################
+code = open("tests/code.txt", "w")
+compteur =0
+identifierTable = []
+			 
 
 if __name__ == "__main__":
     main() 
