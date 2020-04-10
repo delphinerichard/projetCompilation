@@ -115,7 +115,6 @@ def reserver(i):
 		empiler_pile(pile, None)
 
 def moins():
-	print(pile)
 	b = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	empiler_pile(pile, -b)
@@ -174,7 +173,8 @@ def div():
 	depiler_pile(pile)
 	nb2 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
-	nb3 = nb1/nb2
+	nb3 = nb2/nb1
+	print(nb1, nb2, nb3)
 	empiler_pile(pile, nb3)
 
 def sous():
@@ -182,7 +182,7 @@ def sous():
 	depiler_pile(pile)
 	nb2 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
-	nb3 = int(nb1)-int(nb2)
+	nb3 = int(nb2)-int(nb1)
 	empiler_pile(pile, nb3)
 
 def mult():
