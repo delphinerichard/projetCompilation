@@ -403,12 +403,14 @@ def valeur(lexical_analyser):
 
 def valBool(lexical_analyser):
 	if lexical_analyser.isKeyword("true"):
-		lexical_analyser.acceptKeyword("true")	
+		lexical_analyser.acceptKeyword("true")
+		code.write("empiler(1)\n")	
 		logger.debug("boolean true value")
                 
 	else:
 		logger.debug("boolean false value")
-		lexical_analyser.acceptKeyword("false")	
+		lexical_analyser.acceptKeyword("false")
+		code.write("empiler(0)\n")	
         
 	return "boolean"
 
