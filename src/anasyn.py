@@ -419,6 +419,7 @@ def es(lexical_analyser):
 		lexical_analyser.acceptCharacter("(")
 		ident = lexical_analyser.acceptIdentifier()
 		lexical_analyser.acceptCharacter(")")
+		code.write("get\n")
 		logger.debug("Call to get "+ident)
 	elif lexical_analyser.isKeyword("put"):
 		lexical_analyser.acceptKeyword("put")
