@@ -14,38 +14,41 @@ def debutProg(i):
 			i += 1
 
 		# Operations unaires	
-		elif("moins" in lignes[i]):
+		elif("moins" == lignes[i]):
 			moins()
 			i += 1
-		elif("non" in lignes[i]):
+		elif("non" == lignes[i]):
 			not_logique()
 			i += 1
 
 		# Affecte une valeur a une variable
-		elif ("affectation" in lignes[i]):
+		elif ("affectation" == lignes[i]):
 			affectation()
 			i += 1
 
 		# Operateurs binaires
-		elif("add" in lignes[i]):
+		elif("add" == lignes[i]):
 			addition()
 			i += 1
-		elif("diff" in lignes[i]):
-			diff()
-			i += 1
-		elif("mult" in lignes[i]):
+		elif("mult" == lignes[i]):
 			mult()
 			i += 1
-		elif("et" in lignes[i]):
+		elif("div" == lignes[i]):
+			div()
+			i += 1
+		elif("sous" == lignes[i]):
+			sous()
+			i += 1
+		elif("et" == lignes[i]):
 			and_logique()
 			i += 1
-		elif("ou" in lignes[i]):
+		elif("ou" == lignes[i]):
 			or_logique()
 			i += 1
 
 		# Operation d'empilement
 		elif("empiler" in lignes[i]):
-			if ("valeurPile" in lignes[i+1]):
+			if ("valeurPile" == lignes[i+1]):
 				empiler_pile(pile,  pile[int(retrouver_parametre(lignes[i]))])
 				i += 2
 			else:
@@ -53,14 +56,17 @@ def debutProg(i):
 				i += 1
 
 		# Tests booleens
-		elif("egal" in lignes[i]):
+		elif("egal" == lignes[i]):
 			egal()
 			i += 1
-		elif("infeg" in lignes[i]):
+		elif("infeg" == lignes[i]):
 			infeg()
 			i += 1
-		elif("sup" in lignes[i]):
+		elif("sup" == lignes[i]):
 			sup()
+			i += 1
+		elif("diff" == lignes[i]):
+			diff()
 			i += 1
 
 		# If et for et while
@@ -75,12 +81,12 @@ def debutProg(i):
 			i = retrouver_parametre(lignes[i])
 
 		# Entree et sortie du programme
-		elif("put" in lignes[i]):
+		elif("put" == lignes[i]):
 			print(put())
-			i+=1
-		elif("get" in lignes[i]):
+			i += 1
+		elif("get" == lignes[i]):
 			get()
-			i+=1
+			i += 1
 
 		# Erreurs
 		else:
@@ -156,6 +162,22 @@ def addition():
 	empiler_pile(pile, nb3)
 
 def diff():
+	nb1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb3 = int(nb1)!=int(nb2)
+	empiler_pile(pile, nb3)
+
+def div():
+	nb1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb3 = nb1/nb2
+	empiler_pile(pile, nb3)
+
+def sous():
 	nb1 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	nb2 = pile[int(len(pile)-1)]
