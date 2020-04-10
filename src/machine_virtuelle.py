@@ -174,6 +174,7 @@ def div():
 	nb2 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	nb3 = nb2/nb1
+	print(nb1, nb2, nb3)
 	empiler_pile(pile, nb3)
 
 def sous():
@@ -229,6 +230,7 @@ def put():
 
 def get():
 	empiler_pile(pile, input("Tapez une entree puis appuyez sur entree\n"))
+	print(pile)
 	affectation()
 
 def empiler_pile(pile,x):
