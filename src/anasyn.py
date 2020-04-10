@@ -237,6 +237,7 @@ def expression(lexical_analyser):
 	if lexical_analyser.isKeyword("or"):
 		lexical_analyser.acceptKeyword("or")
 		exp1(lexical_analyser)
+		code.write("ou\n")
         
 def exp1(lexical_analyser):
 	logger.debug("parsing exp1")
@@ -245,6 +246,7 @@ def exp1(lexical_analyser):
 	if lexical_analyser.isKeyword("and"):
 		lexical_analyser.acceptKeyword("and")
 		exp2(lexical_analyser)
+		code.write("et\n")
         
 def exp2(lexical_analyser):
 	logger.debug("parsing exp2")
@@ -321,16 +323,19 @@ def exp4(lexical_analyser):
         
 	prim(lexical_analyser)	
 	if lexical_analyser.isCharacter("*") or lexical_analyser.isCharacter("/"):
-		opMult(lexical_analyser)
+		op = opMult(lexical_analyser)
 		prim(lexical_analyser)
+		code.write(str(op)+"\n")
 
 def opMult(lexical_analyser):
 	logger.debug("parsing multiplicative operator: " + lexical_analyser.get_value())
 	if lexical_analyser.isCharacter("*"):
 		lexical_analyser.acceptCharacter("*")
+		return "mult"
                 
 	elif lexical_analyser.isCharacter("/"):
 		lexical_analyser.acceptCharacter("/")
+		return "div"
                 
 	else:
 		msg = "Unknown multiplicative operator <"+ lexical_analyser.get_value() +">!"
@@ -339,21 +344,26 @@ def opMult(lexical_analyser):
 
 def prim(lexical_analyser):
 	logger.debug("parsing prim")
-        
+	op = ""
 	if lexical_analyser.isCharacter("+") or lexical_analyser.isCharacter("-") or lexical_analyser.isKeyword("not"):
-		opUnaire(lexical_analyser)
+		op = opUnaire(lexical_analyser)
 	elemPrim(lexical_analyser)
+	if(op != ""):
+		code.write(str(op))
 
 def opUnaire(lexical_analyser):
 	logger.debug("parsing unary operator: " + lexical_analyser.get_value())
 	if lexical_analyser.isCharacter("+"):
 		lexical_analyser.acceptCharacter("+")
+		return "plus\n"
                 
 	elif lexical_analyser.isCharacter("-"):
 		lexical_analyser.acceptCharacter("-")
+		return "moins\n"
                 
 	elif lexical_analyser.isKeyword("not"):
 		lexical_analyser.acceptKeyword("not")
+		return "non\n"
                 
 	else:
 		msg = "Unknown additive operator <"+ lexical_analyser.get_value() +">!"
@@ -420,6 +430,7 @@ def es(lexical_analyser):
 		lexical_analyser.acceptKeyword("get")
 		lexical_analyser.acceptCharacter("(")
 		ident = lexical_analyser.acceptIdentifier()
+		code.write("empiler("+str(tableIdentificateurs(ident))+")\n")
 		lexical_analyser.acceptCharacter(")")
 		code.write("get\n")
 		logger.debug("Call to get "+ident)
