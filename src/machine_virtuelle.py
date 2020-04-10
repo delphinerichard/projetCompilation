@@ -9,7 +9,13 @@ def program(i):
 def debutProg(i):
 	while (not("finProg" in lignes[i])):	
 		if ("reserver" in lignes[i]):
-			reserver()
+			reserver(retrouver_parametre(lignes[i]))
+			i += 1
+		elif("moins" in lignes[i]):
+			moins()
+			i += 1
+		elif("not" in lignes[i]):
+			not_logique()
 			i += 1
 		elif ("affectation" in lignes[i]):
 			affectation()
@@ -66,8 +72,20 @@ def retrouver_parametre(ligne):
 	return nb
 		
 
-def reserver():
-	empiler_pile(pile, None)
+def reserver(i):
+	for i in range(0, i):
+		empiler_pile(pile, None)
+
+def moins():
+	print(pile)
+	b = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	empiler_pile(pile, -b)
+
+def not_logique():
+	b = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	empiler_pile(pile, (b+1)%2)
 
 def affectation():
 	nb = pile[int(len(pile)-1)]
