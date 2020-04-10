@@ -229,7 +229,7 @@ def put():
 	return nb
 
 def get():
-	empiler_pile(pile, input("Tapez une entree puis appuyez sur entree\n"))
+	empiler_pile(pile, int(input("Tapez une entree puis appuyez sur entree\n")))
 	print(pile)
 	affectation()
 
