@@ -425,6 +425,7 @@ def es(lexical_analyser):
 		lexical_analyser.acceptCharacter("(")
 		expression(lexical_analyser)
 		lexical_analyser.acceptCharacter(")")
+		code.write("put\n")
 		logger.debug("Call to put")
 	else:
 		logger.error("Unknown E/S instruction!")
@@ -434,10 +435,19 @@ def boucle(lexical_analyser):
 	logger.debug("parsing while loop: ")
 	lexical_analyser.acceptKeyword("while")
 
+	lieu_debut = numero_ligne()+1
 	expression(lexical_analyser)
+
+	code.write("tze\n")
+	lieu_tze = numero_ligne()
 
 	lexical_analyser.acceptKeyword("loop")
 	suiteInstr(lexical_analyser)
+
+	code.write("tra("+str(lieu_debut)+")\n")
+	lieu_fin = numero_ligne()+1
+	
+	modif_ligne(lieu_tze, "tze("+str(lieu_fin)+")")
 
 	lexical_analyser.acceptKeyword("end")
 	logger.debug("end of while loop ")
