@@ -5,7 +5,11 @@ begin
   j:=2;
   k:=1;
   if k=1 then
-    i:=i+j
+    if j=3 then
+      i:=i+j
+    else
+      i:=i+10
+    end
   else
     i:=i+k
   end
