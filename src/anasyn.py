@@ -586,6 +586,7 @@ def main():
 
 ########################################################################
 code = open("tests/code.txt", "w")
+code.truncate(0)
 compteur =0
 identifierTable = []
 			 
