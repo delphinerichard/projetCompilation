@@ -7,25 +7,43 @@ def program(i):
 		print ("Erreur : le programme ne commence pas par debutProg")
 
 def debutProg(i):
-	while (not("finProg" in lignes[i])):	
+	while (not("finProg" in lignes[i])):
+		# Reserve de la place pour les variables	
 		if ("reserver" in lignes[i]):
 			reserver(retrouver_parametre(lignes[i]))
 			i += 1
+
+		# Operations unaires	
 		elif("moins" in lignes[i]):
 			moins()
 			i += 1
-		elif("not" in lignes[i]):
+		elif("non" in lignes[i]):
 			not_logique()
 			i += 1
+
+		# Affecte une valeur a une variable
 		elif ("affectation" in lignes[i]):
 			affectation()
 			i += 1
+
+		# Operateurs binaires
 		elif("add" in lignes[i]):
 			addition()
 			i += 1
 		elif("diff" in lignes[i]):
 			diff()
 			i += 1
+		elif("mult" in lignes[i]):
+			mult()
+			i += 1
+		elif("et" in lignes[i]):
+			and_logique()
+			i += 1
+		elif("ou" in lignes[i]):
+			or_logique()
+			i += 1
+
+		# Operation d'empilement
 		elif("empiler" in lignes[i]):
 			if ("valeurPile" in lignes[i+1]):
 				empiler_pile(pile,  pile[int(retrouver_parametre(lignes[i]))])
@@ -33,9 +51,19 @@ def debutProg(i):
 			else:
 				empiler_pile(pile, retrouver_parametre(lignes[i]))
 				i += 1
+
+		# Tests booleens
 		elif("egal" in lignes[i]):
 			egal()
 			i += 1
+		elif("infeg" in lignes[i]):
+			infeg()
+			i += 1
+		elif("sup" in lignes[i]):
+			sup()
+			i += 1
+
+		# If et for et while
 		elif("tze" in lignes[i]):
 			if(pile[int(len(pile)-1)]):
 				depiler_pile(pile)			
@@ -45,14 +73,18 @@ def debutProg(i):
 				i = retrouver_parametre(lignes[i])
 		elif("tra" in lignes[i]):
 			i = retrouver_parametre(lignes[i])
+
+		# Entree et sortie du programme
 		elif("put" in lignes[i]):
 			print(put())
 			i+=1
 		elif("get" in lignes[i]):
 			get()
 			i+=1
+
+		# Erreurs
 		else:
-			print ("ligne",i,":",lignes[i])
+			print("ligne",i,":",lignes[i])
 			i += 1
 
 
@@ -87,6 +119,26 @@ def not_logique():
 	depiler_pile(pile)
 	empiler_pile(pile, (b+1)%2)
 
+def and_logique():
+	b1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	b2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	if(b1 and b2):
+		empiler_pile(pile, 1)
+	else:
+		empiler_pile(pile, 0)
+
+def or_logique():
+	b1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	b2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	if(b1 or b2):
+		empiler_pile(pile, 1)
+	else:
+		empiler_pile(pile, 0)
+
 def affectation():
 	nb = pile[int(len(pile)-1)]
 	depiler_pile(pile)
@@ -111,12 +163,40 @@ def diff():
 	nb3 = int(nb1)-int(nb2)
 	empiler_pile(pile, nb3)
 
+def mult():
+	nb1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb3 = int(nb1)*int(nb2)
+	empiler_pile(pile, nb3)
+
 def egal():
 	nb1 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	nb2 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	if(int(nb1)==int(nb2)):
+		empiler_pile(pile, True)
+	else:
+		empiler_pile(pile, False)
+
+def infeg():
+	nb1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	if(int(nb2)<=int(nb1)):
+		empiler_pile(pile, True)
+	else:
+		empiler_pile(pile, False)
+
+def sup():
+	nb1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	if(int(nb2)>int(nb1)):
 		empiler_pile(pile, True)
 	else:
 		empiler_pile(pile, False)

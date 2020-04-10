@@ -6,12 +6,6 @@ empiler(1)
 get
 empiler(0)
 empiler(1)
-<<<<<<< HEAD
-not
-affectation
-empiler(0)
-valeurPile
-=======
 valeurPile
 empiler(23)
 infeg
@@ -45,6 +39,5 @@ put
 tra(42)
 empiler(34)
 moins
->>>>>>> delphine
 put
 finProg
