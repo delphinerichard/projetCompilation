@@ -9,6 +9,7 @@ def program(i):
 def debutProg(i):
 	while (not("finProg" in lignes[i])):	
 		if ("reserver" in lignes[i]):
+			reserver()
 			i += 1
 		elif ("affectation" in lignes[i]):
 			affectation()
@@ -41,6 +42,9 @@ def debutProg(i):
 		elif("put" in lignes[i]):
 			print(put())
 			i+=1
+		elif("get" in lignes[i]):
+			get()
+			i+=1
 		else:
 			print ("ligne",i,":",lignes[i])
 			i += 1
@@ -62,6 +66,8 @@ def retrouver_parametre(ligne):
 	return nb
 		
 
+def reserver():
+	empiler_pile(pile, None)
 
 def affectation():
 	nb = pile[int(len(pile)-1)]
@@ -101,6 +107,11 @@ def put():
 	nb = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	return nb
+
+def get():
+	empiler_pile(pile, input("Tapez une entree puis appuyez sur entree\n"))
+	print(pile)
+	affectation()
 
 def empiler_pile(pile,x):
 	pile.append(x)
