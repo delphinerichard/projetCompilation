@@ -1,6 +1,5 @@
 
 debutProg
-<<<<<<< HEAD
 reserver(3)
 empiler(0)
 empiler(1)
@@ -26,35 +25,6 @@ empiler(0)
 valeurPile
 empiler(1)
 valeurPile
-=======
-reserver(2)
-empiler(1)
-empiler(0)
-affectation
-empiler(0)
-get
-empiler(0)
-valeurPile
-empiler(0)
-diff
-tze(34)
-empiler(0)
-valeurPile
-empiler(0)
-valeurPile
-empiler(2)
-div
-empiler(2)
-mult
-sous
-empiler(0)
-egal
-tze(31)
-empiler(1)
-empiler(1)
-valeurPile
-empiler(1)
->>>>>>> aa93efd7908a46a7889d553f7d5db05b7064154c
 add
 affectation
 tra(36)

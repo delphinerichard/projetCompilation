@@ -1,3 +1,5 @@
+
+
 import sys
 
 def program(i):
@@ -14,41 +16,38 @@ def debutProg(i):
 			i += 1
 
 		# Operations unaires	
-		elif("moins" == lignes[i]):
+		elif("moins" in lignes[i]):
 			moins()
 			i += 1
-		elif("non" == lignes[i]):
+		elif("non" in lignes[i]):
 			not_logique()
 			i += 1
 
 		# Affecte une valeur a une variable
-		elif ("affectation" == lignes[i]):
+		elif ("affectation" in lignes[i]):
 			affectation()
 			i += 1
 
 		# Operateurs binaires
-		elif("add" == lignes[i]):
+		elif("add" in lignes[i]):
 			addition()
 			i += 1
-		elif("mult" == lignes[i]):
+		elif("diff" in lignes[i]):
+			diff()
+			i += 1
+		elif("mult" in lignes[i]):
 			mult()
 			i += 1
-		elif("div" == lignes[i]):
-			div()
-			i += 1
-		elif("sous" == lignes[i]):
-			sous()
-			i += 1
-		elif("et" == lignes[i]):
+		elif("et" in lignes[i]):
 			and_logique()
 			i += 1
-		elif("ou" == lignes[i]):
+		elif("ou" in lignes[i]):
 			or_logique()
 			i += 1
 
 		# Operation d'empilement
 		elif("empiler" in lignes[i]):
-			if ("valeurPile" == lignes[i+1]):
+			if ("valeurPile" in lignes[i+1]):
 				empiler_pile(pile,  pile[int(retrouver_parametre(lignes[i]))])
 				i += 2
 			else:
@@ -56,17 +55,14 @@ def debutProg(i):
 				i += 1
 
 		# Tests booleens
-		elif("egal" == lignes[i]):
+		elif("egal" in lignes[i]):
 			egal()
 			i += 1
-		elif("infeg" == lignes[i]):
+		elif("infeg" in lignes[i]):
 			infeg()
 			i += 1
-		elif("sup" == lignes[i]):
+		elif("sup" in lignes[i]):
 			sup()
-			i += 1
-		elif("diff" == lignes[i]):
-			diff()
 			i += 1
 
 		# If et for et while
@@ -81,12 +77,12 @@ def debutProg(i):
 			i = retrouver_parametre(lignes[i])
 
 		# Entree et sortie du programme
-		elif("put" == lignes[i]):
+		elif("put" in lignes[i]):
 			print(put())
-			i += 1
-		elif("get" == lignes[i]):
+			i+=1
+		elif("get" in lignes[i]):
 			get()
-			i += 1
+			i+=1
 
 		# Erreurs
 		else:
@@ -115,6 +111,7 @@ def reserver(i):
 		empiler_pile(pile, None)
 
 def moins():
+	print(pile)
 	b = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	empiler_pile(pile, -b)
@@ -165,24 +162,7 @@ def diff():
 	depiler_pile(pile)
 	nb2 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
-	nb3 = int(nb1)!=int(nb2)
-	empiler_pile(pile, nb3)
-
-def div():
-	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
-	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
-	nb3 = nb2/nb1
-	print(nb1, nb2, nb3)
-	empiler_pile(pile, nb3)
-
-def sous():
-	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
-	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
-	nb3 = int(nb2)-int(nb1)
+	nb3 = int(nb1)-int(nb2)
 	empiler_pile(pile, nb3)
 
 def mult():
