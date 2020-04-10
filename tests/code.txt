@@ -10,12 +10,6 @@ empiler(5)
 diff
 tze(36)
 empiler(1)
-<<<<<<< HEAD
-empiler(2)
-affectation
-empiler(0)
-empiler(0)
-=======
 empiler(1)
 affectation
 empiler(1)
@@ -24,7 +18,6 @@ empiler(5)
 diff
 tze(29)
 empiler(1)
->>>>>>> delphine
 valeurPile
 put
 empiler(1)
@@ -33,8 +26,6 @@ valeurPile
 empiler(1)
 add
 affectation
-<<<<<<< HEAD
-=======
 tra(14)
 empiler(0)
 empiler(0)
@@ -43,5 +34,4 @@ empiler(1)
 add
 affectation
 tra(6)
->>>>>>> delphine
 finProg

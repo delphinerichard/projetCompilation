@@ -16,6 +16,9 @@ def debutProg(i):
 		elif("add" in lignes[i]):
 			addition()
 			i += 1
+		elif("diff" in lignes[i]):
+			diff()
+			i += 1
 		elif("empiler" in lignes[i]):
 			if ("valeurPile" in lignes[i+1]):
 				empiler_pile(pile,  pile[int(retrouver_parametre(lignes[i]))])
@@ -37,8 +40,9 @@ def debutProg(i):
 			i = retrouver_parametre(lignes[i])
 		elif("put" in lignes[i]):
 			print(put())
+			i+=1
 		else:
-			print ("ligne"+i+":"+lignes[i])
+			print ("ligne",i,":",lignes[i])
 			i += 1
 
 
@@ -75,6 +79,14 @@ def addition():
 	nb3 = int(nb1)+int(nb2)
 	empiler_pile(pile, nb3)
 
+def diff():
+	nb1 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb2 = pile[int(len(pile)-1)]
+	depiler_pile(pile)
+	nb3 = int(nb1)-int(nb2)
+	empiler_pile(pile, nb3)
+
 def egal():
 	nb1 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
@@ -87,7 +99,7 @@ def egal():
 
 def put():
 	nb = pile[int(len(pile)-1)]
-	depiler(pile)
+	depiler_pile(pile)
 	return nb
 
 def empiler_pile(pile,x):
