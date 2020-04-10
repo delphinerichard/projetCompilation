@@ -1,0 +1,7 @@
+procedure pp is
+  i,j:integer;
+begin
+  i:=1;
+  j:=2;
+  i:=i+j
+end.
