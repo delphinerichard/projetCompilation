@@ -1,0 +1,12 @@
+procedure p8 is
+    function fa (n: in integer) return integer is
+    begin
+        if n=0 then
+            return 1
+        else
+            return n*fa(n-1)
+        end
+    end;
+begin
+    put(fa(3))
+end

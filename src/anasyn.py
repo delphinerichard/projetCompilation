@@ -107,7 +107,10 @@ def corpsFonct(lexical_analyser):
 	if not lexical_analyser.isKeyword("begin"):
 		partieDeclaProc(lexical_analyser)
 	lexical_analyser.acceptKeyword("begin")
-	suiteInstrNonVide(lexical_analyser)
+	code.write("tra\n")
+	lieu_tra = numero_ligne()
+	num = suiteInstrNonVide(lexical_analyser)
+	modif_ligne(lieu_tra, "tra("+str(num)+")")
 	lexical_analyser.acceptKeyword("end")
 
 def partieFormelle(lexical_analyser):
@@ -177,16 +180,18 @@ def listeIdent(lexical_analyser):
 		listeIdent(lexical_analyser)
 
 def suiteInstrNonVide(lexical_analyser):
-	instr(lexical_analyser)
+	num = instr(lexical_analyser)
 	if lexical_analyser.isCharacter(";"):
 		lexical_analyser.acceptCharacter(";")
 		suiteInstrNonVide(lexical_analyser)
+	return num
 
 def suiteInstr(lexical_analyser):
 	if not lexical_analyser.isKeyword("end"):
 		suiteInstrNonVide(lexical_analyser)
 
-def instr(lexical_analyser):		
+def instr(lexical_analyser):	
+	num = 0	
 	if lexical_analyser.isKeyword("while"):
 		boucle(lexical_analyser)
 	elif lexical_analyser.isKeyword("if"):
@@ -194,7 +199,7 @@ def instr(lexical_analyser):
 	elif lexical_analyser.isKeyword("get") or lexical_analyser.isKeyword("put"):
 		es(lexical_analyser)
 	elif lexical_analyser.isKeyword("return"):
-		retour(lexical_analyser)
+		num = retour(lexical_analyser)
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
 		if lexical_analyser.isSymbol(":="):				
@@ -217,6 +222,8 @@ def instr(lexical_analyser):
 	else:
 		logger.error("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
 		raise AnaSynException("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
+
+	return num
 
 def tableIdentificateurs(ident):
 	for i in range (len(identifierTable)):
@@ -380,10 +387,9 @@ def elemPrim(lexical_analyser):
 		valeur(lexical_analyser)
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
-		code.write("empiler("+str(tableIdentificateurs(ident))+")\n")
-		code.write("valeurPile\n")
 		if lexical_analyser.isCharacter("("):			# Appel fonct
 			lexical_analyser.acceptCharacter("(")
+			code.write("reserverBloc\n")
 			if not lexical_analyser.isCharacter(")"):
 				listePe(lexical_analyser)
 
@@ -393,7 +399,8 @@ def elemPrim(lexical_analyser):
 			logger.debug("Call to function: " + ident)
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
-                        # ...
+			code.write("empilerAd("+str(tableIdentificateurs(ident))+")\n")
+			code.write("valeurPile\n")
 	else:
 		logger.error("Unknown Value!")
 		raise AnaSynException("Unknown Value!")
@@ -499,6 +506,9 @@ def retour(lexical_analyser):
 	logger.debug("parsing return instruction")
 	lexical_analyser.acceptKeyword("return")
 	expression(lexical_analyser)
+	code.write("retourFonc\n")
+	lieu_retour = numero_ligne()
+	return lieu_retour
 
 def numero_ligne():
 	global code
