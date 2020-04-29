@@ -85,6 +85,7 @@ def fonction(lexical_analyser):
 	lexical_analyser.acceptKeyword("function")
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of function : "+ident)
+	identifierTable.append(ident)
 	
 	partieFormelle(lexical_analyser)
 
@@ -391,7 +392,7 @@ def elemPrim(lexical_analyser):
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")
-			code.write("traStat("+str(compteur)+", truc)\n")
+			code.write("traStat("+str(tableIdentificateurs(ident))+", "+str(compteur)+")\n")
 			logger.debug("Call to function: " + ident)
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
