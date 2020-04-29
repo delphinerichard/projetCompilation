@@ -7,10 +7,16 @@ def program(i):
 		print ("Erreur : le programme ne commence pas par debutProg")
 
 def debutProg(i):
+	base = 0
 	while (not("finProg" in lignes[i])):
-		# Reserve de la place pour les variables	
-		if ("reserver" in lignes[i]):
-			reserver(retrouver_parametre(lignes[i]))
+		print(pile, i+1)
+		# Reserve de la place pour les variables et fonctions
+		if ("reserver(" in lignes[i]):
+			reserver(retrouver_parametres(lignes[i])[0])
+			i += 1
+		elif("reserverBloc"==lignes[i]):
+			empiler_pile(base)
+			empiler_pile(-1)
 			i += 1
 
 		# Operations unaires	
@@ -49,10 +55,10 @@ def debutProg(i):
 		# Operation d'empilement
 		elif("empiler" in lignes[i]):
 			if ("valeurPile" == lignes[i+1]):
-				empiler_pile(pile,  pile[int(retrouver_parametre(lignes[i]))])
+				empiler_pile(pile[base+retrouver_parametres(lignes[i])[0]])
 				i += 2
 			else:
-				empiler_pile(pile, retrouver_parametre(lignes[i]))
+				empiler_pile(retrouver_parametres(lignes[i])[0])
 				i += 1
 
 		# Tests booleens
@@ -70,15 +76,15 @@ def debutProg(i):
 			i += 1
 
 		# If et for et while
-		elif("tze" in lignes[i]):
+		elif("tze(" in lignes[i]):
 			if(pile[int(len(pile)-1)]):
-				depiler_pile(pile)			
+				depiler_pile()			
 				i += 1
 			else:
-				depiler_pile(pile)
-				i = retrouver_parametre(lignes[i])
-		elif("tra" in lignes[i]):
-			i = retrouver_parametre(lignes[i])
+				depiler_pile()
+				i = retrouver_parametres(lignes[i])[0]
+		elif("tra(" in lignes[i]):
+			i = retrouver_parametres(lignes[i])[0]
 
 		# Entree et sortie du programme
 		elif("put" == lignes[i]):
@@ -88,158 +94,174 @@ def debutProg(i):
 			get()
 			i += 1
 
+		# Les fonctions
+		elif("traStat" in lignes[i]):
+			paramTraStat = retrouver_parametres(lignes[i])
+			nbParam = paramTraStat[1]
+			base = len(pile) - nbParam
+			pile[base - 1] = i + 1
+			i = paramTraStat[0]
+		elif("retourFonct" == lignes[i]):
+			tmp = pile[len(pile)-1]
+			while(len(pile)>base):
+				depiler_pile()
+			i = pile[len(pile)-1]
+			depiler_pile()
+			base = pile[len(pile)-1]
+			depiler_pile()
+			empiler_pile(tmp)
+
 		# Erreurs
 		else:
 			print("ligne",i,":",lignes[i])
 			i += 1
 
-
-def retrouver_parametre(ligne):
-	tab = []
-	compteur = False
-	for i in ligne:
-		if(i == ")"):
-			compteur = False
-		if(compteur):
-			tab.append(i)
-		if(i == "("):
-			compteur = True
-	nb = 0
-	for j in range(len(tab)):
-		nb += int(tab[j])*(10**(len(tab)-1-j))
-	return nb
 		
+def retrouver_parametres(ligne):
+	tab = []
+	tmp = 0
+	number = False
+	for i in ligne:
+		if(i == "("):
+			number = True
+		elif(i == ","):
+			tab.append(tmp)
+			tmp = 0
+		elif(i == ")"):
+			tab.append(tmp)
+			number = False
+		elif(number):
+			tmp *= 10
+			tmp += int(i)
+	return tab
 
 def reserver(i):
 	for i in range(0, i):
-		empiler_pile(pile, None)
+		empiler_pile(None)
 
 def moins():
 	b = pile[int(len(pile)-1)]
-	depiler_pile(pile)
-	empiler_pile(pile, -b)
+	depiler_pile()
+	empiler_pile(-b)
 
 def not_logique():
 	b = pile[int(len(pile)-1)]
-	depiler_pile(pile)
-	empiler_pile(pile, (b+1)%2)
+	depiler_pile()
+	empiler_pile((b+1)%2)
 
 def and_logique():
 	b1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	b2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	if(b1 and b2):
-		empiler_pile(pile, 1)
+		empiler_pile(1)
 	else:
-		empiler_pile(pile, 0)
+		empiler_pile(0)
 
 def or_logique():
 	b1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	b2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	if(b1 or b2):
-		empiler_pile(pile, 1)
+		empiler_pile(True)
 	else:
-		empiler_pile(pile, 0)
+		empiler_pile(False)
 
 def affectation():
 	nb = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	adresse = pile[int(len(pile)-1)]
 	if (len(pile)-1>int(adresse)):
-		depiler_pile(pile)
+		depiler_pile()
 	pile[int(adresse)] = nb
 
 def addition():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb3 = int(nb1)+int(nb2)
-	empiler_pile(pile, nb3)
+	empiler_pile(nb3)
 
 def diff():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb3 = int(nb1)!=int(nb2)
-	empiler_pile(pile, nb3)
+	empiler_pile(nb3)
 
 def div():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb3 = nb2/nb1
-	print(nb1, nb2, nb3)
-	empiler_pile(pile, nb3)
+	empiler_pile(nb3)
 
 def sous():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb3 = int(nb2)-int(nb1)
-	empiler_pile(pile, nb3)
+	empiler_pile(nb3)
 
 def mult():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb3 = int(nb1)*int(nb2)
-	empiler_pile(pile, nb3)
+	empiler_pile(nb3)
 
 def egal():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	if(int(nb1)==int(nb2)):
-		empiler_pile(pile, True)
+		empiler_pile(True)
 	else:
-		empiler_pile(pile, False)
+		empiler_pile(False)
 
 def infeg():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	if(int(nb2)<=int(nb1)):
-		empiler_pile(pile, True)
+		empiler_pile(True)
 	else:
-		empiler_pile(pile, False)
+		empiler_pile(False)
 
 def sup():
 	nb1 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	nb2 = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	if(int(nb2)>int(nb1)):
-		empiler_pile(pile, True)
+		empiler_pile(True)
 	else:
-		empiler_pile(pile, False)
+		empiler_pile(False)
 
 def put():
 	nb = pile[int(len(pile)-1)]
-	depiler_pile(pile)
+	depiler_pile()
 	return nb
 
 def get():
-	empiler_pile(pile, input("Tapez une entree puis appuyez sur entree\n"))
-	print(pile)
+	empiler_pile(int(input("Tapez une entree puis appuyez sur entree\n")))
 	affectation()
 
-def empiler_pile(pile,x):
+def empiler_pile(x):
 	pile.append(x)
 
-def depiler_pile(pile):
+def depiler_pile():
 	pile.pop()
 		
-
 ########################################################################				 	
 def main():
  
