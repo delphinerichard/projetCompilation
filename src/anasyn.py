@@ -56,9 +56,7 @@ def partieDecla(lexical_analyser):
 	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
 		listeDeclaOp(lexical_analyser)
 	if not lexical_analyser.isKeyword("begin") :
-    		listeDeclaVar(lexical_analyser)
-	else:
-    		listeDeclaVar(lexical_analyser)                
+    		listeDeclaVar(lexical_analyser)               
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -109,8 +107,8 @@ def corpsFonct(lexical_analyser):
 	lexical_analyser.acceptKeyword("begin")
 	code.write("tra\n")
 	lieu_tra = numero_ligne()
-	num = suiteInstrNonVide(lexical_analyser)
-	modif_ligne(lieu_tra, "tra("+str(num)+")")
+	suiteInstrNonVide(lexical_analyser)
+	modif_ligne(lieu_tra, "tra("+str(lieu_retour+1)+")")
 	lexical_analyser.acceptKeyword("end")
 
 def partieFormelle(lexical_analyser):
@@ -180,18 +178,16 @@ def listeIdent(lexical_analyser):
 		listeIdent(lexical_analyser)
 
 def suiteInstrNonVide(lexical_analyser):
-	num = instr(lexical_analyser)
+	instr(lexical_analyser)
 	if lexical_analyser.isCharacter(";"):
 		lexical_analyser.acceptCharacter(";")
 		suiteInstrNonVide(lexical_analyser)
-	return num
 
 def suiteInstr(lexical_analyser):
 	if not lexical_analyser.isKeyword("end"):
 		suiteInstrNonVide(lexical_analyser)
 
-def instr(lexical_analyser):	
-	num = 0	
+def instr(lexical_analyser):
 	if lexical_analyser.isKeyword("while"):
 		boucle(lexical_analyser)
 	elif lexical_analyser.isKeyword("if"):
@@ -199,7 +195,7 @@ def instr(lexical_analyser):
 	elif lexical_analyser.isKeyword("get") or lexical_analyser.isKeyword("put"):
 		es(lexical_analyser)
 	elif lexical_analyser.isKeyword("return"):
-		num = retour(lexical_analyser)
+		retour(lexical_analyser)
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
 		if lexical_analyser.isSymbol(":="):				
@@ -222,8 +218,6 @@ def instr(lexical_analyser):
 	else:
 		logger.error("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
 		raise AnaSynException("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
-
-	return num
 
 def tableIdentificateurs(ident):
 	for i in range (len(identifierTable)):
@@ -390,12 +384,14 @@ def elemPrim(lexical_analyser):
 		if lexical_analyser.isCharacter("("):			# Appel fonct
 			lexical_analyser.acceptCharacter("(")
 			code.write("reserverBloc\n")
+			compteur =0
 			if not lexical_analyser.isCharacter(")"):
+				compteur +=1
 				listePe(lexical_analyser)
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")
-
+			code.write("traStat("+str(compteur)+", truc)\n")
 			logger.debug("Call to function: " + ident)
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
@@ -503,12 +499,12 @@ def altern(lexical_analyser):
 	logger.debug("end of if")
 
 def retour(lexical_analyser):
+	global lieu_retour
 	logger.debug("parsing return instruction")
 	lexical_analyser.acceptKeyword("return")
 	expression(lexical_analyser)
 	code.write("retourFonc\n")
 	lieu_retour = numero_ligne()
-	return lieu_retour
 
 def numero_ligne():
 	global code
@@ -620,6 +616,7 @@ def main():
 
 ########################################################################
 code = open("tests/code.txt", "w")
+lieu_retour = 0
 code.truncate(0)
 compteur =0
 identifierTable = []

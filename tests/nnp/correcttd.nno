@@ -9,4 +9,4 @@ procedure p8 is
     end;
 begin
     put(fa(3))
-end
+end.
