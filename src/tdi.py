@@ -29,3 +29,12 @@ class tdi:
             if(i["nom"] == variable):
                 return True
         return False
+
+    def isType(variable, type):
+        if !(This.contient(variable)):
+            raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
+        else:
+            for i in self.table:
+                if(i["nom"] == variable and i["type"] == type:
+                    return True
+            return False
