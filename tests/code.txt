@@ -1,23 +1,18 @@
 
 debutProg
 tra(21)
-<<<<<<< HEAD
-empiler(0)
-=======
-empilerAd(1)
->>>>>>> manon
+empilerParam(0)
 valeurPile
 empiler(0)
 egal
 tze(11)
 empiler(1)
-<<<<<<< HEAD
 retourFonct
 tra(21)
-empiler(0)
+empilerParam(0)
 valeurPile
 reserverBloc
-empiler(0)
+empilerParam(0)
 valeurPile
 empiler(1)
 sous
@@ -27,22 +22,5 @@ retourFonct
 reserverBloc
 empiler(3)
 traStat(3,1)
-=======
-retourFonc
-tra(21)
-empilerAd(1)
-valeurPile
-reserverBloc
-empilerAd(1)
-valeurPile
-empiler(1)
-sous
-traStat(0, 1)
-mult
-retourFonc
-reserverBloc
-empiler(3)
-traStat(0, 1)
->>>>>>> manon
 put
 finProg

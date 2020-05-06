@@ -8,6 +8,7 @@ def program(i):
 
 def debutProg(i):
 	base = 0
+	nbParam = 0
 	while (not("finProg" in lignes[i])):
 		print(pile, i+1)
 		# Reserve de la place pour les variables et fonctions
@@ -16,6 +17,7 @@ def debutProg(i):
 			i += 1
 		elif("reserverBloc"==lignes[i]):
 			empiler_pile(base)
+			empiler_pile(-1)
 			empiler_pile(-1)
 			i += 1
 
@@ -53,13 +55,18 @@ def debutProg(i):
 			i += 1
 
 		# Operation d'empilement
-		elif("empiler" in lignes[i]):
-			if ("valeurPile" == lignes[i+1]):
-				empiler_pile(pile[base+retrouver_parametres(lignes[i])[0]])
-				i += 2
-			else:
-				empiler_pile(retrouver_parametres(lignes[i])[0])
-				i += 1
+		elif("empilerParam(" in lignes[i]):
+			empiler_pile(base+retrouver_parametres(lignes[i])[0])
+			i += 1
+		elif("empilerAd(" in lignes[i]):
+			empiler_pile(base+retrouver_parametres(lignes[i])[0]+nbParam)
+			i += 1
+		elif("empiler(" in lignes[i]):
+			empiler_pile(retrouver_parametres(lignes[i])[0])
+			i += 1
+		elif("valeurPile" == lignes[i]):
+			valeurPile()
+			i += 1
 
 		# Tests booleens
 		elif("egal" == lignes[i]):
@@ -99,6 +106,7 @@ def debutProg(i):
 			paramTraStat = retrouver_parametres(lignes[i])
 			nbParam = paramTraStat[1]
 			base = len(pile) - nbParam
+			pile[base - 2] = nbParam
 			pile[base - 1] = i + 1
 			i = paramTraStat[0]
 		elif("retourFonct" == lignes[i]):
@@ -107,7 +115,12 @@ def debutProg(i):
 				depiler_pile()
 			i = pile[len(pile)-1]
 			depiler_pile()
-			base = pile[len(pile)-1]
+			base = pile[len(pile)-2]
+			depiler_pile()
+			if(base==0):
+				nbParam = 0
+			else:
+				nbParam = pile[base-2]
 			depiler_pile()
 			empiler_pile(tmp)
 
@@ -255,6 +268,11 @@ def put():
 def get():
 	empiler_pile(int(input("Tapez une entree puis appuyez sur entree\n")))
 	affectation()
+
+def valeurPile():
+	adresse = pile[len(pile)-1]
+	depiler_pile()
+	empiler_pile(pile[adresse])
 
 def empiler_pile(x):
 	pile.append(x)

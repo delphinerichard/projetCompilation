@@ -392,11 +392,11 @@ def elemPrim(lexical_analyser):
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")
-			code.write("traStat("+str(tableIdentificateurs(ident))+", "+str(compteur)+")\n")
+			code.write("traStat("+str(tableIdentificateurs(ident))+","+str(compteur)+")\n") #Pour correcttd, ca doit mettre traStat(3,1) pour toutes les lignes 
 			logger.debug("Call to function: " + ident)
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
-			code.write("empilerAd("+str(tableIdentificateurs(ident))+")\n")
+			code.write("empilerAd("+str(tableIdentificateurs(ident))+")\n") #Pour correcttd, Ca doit mettre empilerParam(0) l.4, l.12 et l.15 me semble
 			code.write("valeurPile\n")
 	else:
 		logger.error("Unknown Value!")
