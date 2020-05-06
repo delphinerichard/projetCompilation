@@ -56,9 +56,7 @@ def partieDecla(lexical_analyser):
 	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
 		listeDeclaOp(lexical_analyser)
 	if not lexical_analyser.isKeyword("begin") :
-    		listeDeclaVar(lexical_analyser)
-	else:
-    		listeDeclaVar(lexical_analyser)                
+    		listeDeclaVar(lexical_analyser)               
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -87,6 +85,7 @@ def fonction(lexical_analyser):
 	lexical_analyser.acceptKeyword("function")
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of function : "+ident)
+	identifierTable.append(ident)
 	
 	partieFormelle(lexical_analyser)
 
@@ -107,7 +106,10 @@ def corpsFonct(lexical_analyser):
 	if not lexical_analyser.isKeyword("begin"):
 		partieDeclaProc(lexical_analyser)
 	lexical_analyser.acceptKeyword("begin")
+	code.write("tra\n")
+	lieu_tra = numero_ligne()
 	suiteInstrNonVide(lexical_analyser)
+	modif_ligne(lieu_tra, "tra("+str(lieu_retour+1)+")")
 	lexical_analyser.acceptKeyword("end")
 
 def partieFormelle(lexical_analyser):
@@ -186,7 +188,7 @@ def suiteInstr(lexical_analyser):
 	if not lexical_analyser.isKeyword("end"):
 		suiteInstrNonVide(lexical_analyser)
 
-def instr(lexical_analyser):		
+def instr(lexical_analyser):
 	if lexical_analyser.isKeyword("while"):
 		boucle(lexical_analyser)
 	elif lexical_analyser.isKeyword("if"):
@@ -380,20 +382,22 @@ def elemPrim(lexical_analyser):
 		valeur(lexical_analyser)
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
-		code.write("empiler("+str(tableIdentificateurs(ident))+")\n")
-		code.write("valeurPile\n")
 		if lexical_analyser.isCharacter("("):			# Appel fonct
 			lexical_analyser.acceptCharacter("(")
+			code.write("reserverBloc\n")
+			compteur =0
 			if not lexical_analyser.isCharacter(")"):
+				compteur +=1
 				listePe(lexical_analyser)
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")
-
+			code.write("traStat("+str(tableIdentificateurs(ident))+", "+str(compteur)+")\n")
 			logger.debug("Call to function: " + ident)
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
-                        # ...
+			code.write("empilerAd("+str(tableIdentificateurs(ident))+")\n")
+			code.write("valeurPile\n")
 	else:
 		logger.error("Unknown Value!")
 		raise AnaSynException("Unknown Value!")
@@ -496,9 +500,12 @@ def altern(lexical_analyser):
 	logger.debug("end of if")
 
 def retour(lexical_analyser):
+	global lieu_retour
 	logger.debug("parsing return instruction")
 	lexical_analyser.acceptKeyword("return")
 	expression(lexical_analyser)
+	code.write("retourFonc\n")
+	lieu_retour = numero_ligne()
 
 def numero_ligne():
 	global code
@@ -610,6 +617,7 @@ def main():
 
 ########################################################################
 code = open("tests/code.txt", "w")
+lieu_retour = 0
 code.truncate(0)
 compteur =0
 identifierTable = []

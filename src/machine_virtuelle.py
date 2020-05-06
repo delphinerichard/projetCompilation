@@ -88,7 +88,7 @@ def debutProg(i):
 
 		# Entree et sortie du programme
 		elif("put" == lignes[i]):
-			print(put())
+			print("Sortie : "+str(put()))
 			i += 1
 		elif("get" == lignes[i]):
 			get()
@@ -270,7 +270,7 @@ def main():
 
 	program(1)
 
-	print (pile)
+	print ("pile = "+str(pile))
 			
 
 ########################################################################
