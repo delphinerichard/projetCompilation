@@ -31,7 +31,7 @@ class tdi:
         return False
 
     def isType(self, variable, type):
-        if !(This.contient(variable)):
+        if not (self.contient(variable)):
             raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
         else:
             for i in self.table:
@@ -40,7 +40,7 @@ class tdi:
             return False
 
     def getType(self, variable):
-        if !(This.contient(variable)):
+        if not (self.contient(variable)):
             raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
         else:
             for i in self.table:
