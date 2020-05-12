@@ -7,7 +7,8 @@ def program(i):
 		print ("Erreur : le programme ne commence pas par debutProg")
 
 def debutProg(i):
-	while (not("finProg" in lignes[i])):
+	errorType = False
+	while ((not("finProg" in lignes[i])) and (errorType == False)):
 		# Reserve de la place pour les variables	
 		if ("reserver" in lignes[i]):
 			reserver(retrouver_parametre(lignes[i]))
@@ -82,11 +83,18 @@ def debutProg(i):
 
 		# Entree et sortie du programme
 		elif("put" == lignes[i]):
-			print(put())
-			i += 1
+			res = put()
+			if (res == -1) :
+				errorType = True
+			else :
+				print(res)
+				i += 1
 		elif("get" == lignes[i]):
-			get()
-			i += 1
+			res = get()
+			if (res == -1) :
+				errorType = True
+			else :
+				i += 1
 
 		# Erreurs
 		else:
@@ -241,6 +249,7 @@ def get():
 		return -1
 	else :
 		empiler_pile(pile, int(x))
+		return 0
 	affectation()
 
 def empiler_pile(pile,x):
