@@ -10,8 +10,11 @@ class tdi:
 
     #ajout d'une variable dans la TDI
     def ajoutVar(self, nom, type, portee, adresse):
-        nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'adresse': adresse}
-        self.table.append(nouvelleVar)
+        if(self.contient(nom)):
+            raise Exception("Le nom de cette variable est deja utilise")
+        else:
+            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'adresse': adresse}
+            self.table.append(nouvelleVar)
 
     #ajout de l'identificateur d'une fonction dans la TDI
     def ajoutFonc(self, nom, portee, nomArg, modePassage, typeRes):
