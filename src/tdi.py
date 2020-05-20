@@ -57,3 +57,10 @@ class tdi:
             for i in range(0, len(self.table)-1):
                 if(table[i]["nom"] == variable):
                     return i
+
+    #renvoie le type de la variable qui correspond a l'adresse en parametre
+    def typeFromAddr(self, addr):
+        if (len(self.table) > addr):
+            raise Exception("Il n'y a pas de variable à l'adresse {}".format(addr))
+        else:
+            return self.table[addr]["type"]
