@@ -6,6 +6,7 @@
 
 import sys, argparse, re
 import logging
+from tdi import tdi
 
 import analex
 
@@ -611,8 +612,8 @@ def main():
 ########################################################################
 code = open("tests/code.txt", "w")
 code.truncate(0)
-compteur =0
-identifierTable = []
+compteur = 0
+identifierTable = tdi() # On utilise notre propre TDI (voir fichier tdi.py)
 			 
 
 if __name__ == "__main__":

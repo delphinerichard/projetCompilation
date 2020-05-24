@@ -229,8 +229,22 @@ def put():
 	return nb
 
 def get():
-	empiler_pile(pile, int(input("Tapez une entree puis appuyez sur entree\n")))
+#	empiler_pile(pile, int(input("Tapez une entree puis appuyez sur entree\n")))
+#	affectation()
+	x = input("Tapez une entree puis appuyez sur entree\n")
+	if (x == "True" or x == "true") :
+		#empiler_pile(pile, 1) #Avec cette ligne, True fonctionne pour l'instruction get
+		# On interdit le booléen True
+		print("Error : On ne peut pas appliquer l'instruction get à un booléen")
+		return -1
+	elif (x == "False" or x == "false") :
+		#empiler_pile(pile, 0)
+		print("Error : On ne peut pas appliquer l'instruction get à un booléen")
+		return -1
+	else :
+		empiler_pile(pile, int(x))
 	affectation()
+
 
 def empiler_pile(pile,x):
 	pile.append(x)
