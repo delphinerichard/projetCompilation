@@ -86,15 +86,16 @@ def fonction(lexical_analyser):
 	lexical_analyser.acceptKeyword("function")
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of function : "+ident)
-	identifierTable.ajoutVar(ident, "", "", "")
 	
 	partieFormelle(lexical_analyser)
 
 	lexical_analyser.acceptKeyword("return")
-	nnpType(lexical_analyser)
+	typ = nnpType(lexical_analyser)
+
         
 	lexical_analyser.acceptKeyword("is")
-	corpsFonct(lexical_analyser)
+	lieu_fonc = corpsFonct(lexical_analyser)
+	identifierTable.ajoutFonc(ident, lieu_fonc, typ)
 
 def corpsProc(lexical_analyser):
 	if not lexical_analyser.isKeyword("begin"):
@@ -112,6 +113,7 @@ def corpsFonct(lexical_analyser):
 	suiteInstrNonVide(lexical_analyser)
 	modif_ligne(lieu_tra, "tra("+str(lieu_retour+1)+")")
 	lexical_analyser.acceptKeyword("end")
+	return lieu_tra+1
 
 def partieFormelle(lexical_analyser):
 	lexical_analyser.acceptCharacter("(")
@@ -133,7 +135,7 @@ def specif(lexical_analyser):
                 
 	typeVar = nnpType(lexical_analyser)
 	for i in liste:
-		identifierTable.ajoutVar(i, typeVar, "", "")
+		identifierTable.ajoutArg(i, typeVar, "", "")
 
 
 def mode(lexical_analyser):
@@ -174,7 +176,7 @@ def declaVar(lexical_analyser):
 	logger.debug("now parsing type...")
 	typeVar = nnpType(lexical_analyser)
 	for i in liste:
-		identifierTable.ajoutVar(i, typeVar, "", "")
+		identifierTable.ajoutVar(i, typeVar, "main")
 	lexical_analyser.acceptCharacter(";")
 
 def listeIdent(lexical_analyser):
@@ -398,7 +400,7 @@ def elemPrim(lexical_analyser):
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")
-			code.write("traStat("+str(identifierTable.noLigne(ident))+", "+str(compteur)+")\n")
+			code.write("traStat("+str(identifierTable.getLigneDepart(ident))+","+str(compteur)+")\n")
 			logger.debug("Call to function: " + ident)
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
