@@ -33,7 +33,7 @@ class tdi:
         #nom: nom de la procedure ; ligneDepart : la ligne de depart dans code.txt
     def ajoutProc(self, nom, ligneDepart):
         nouvelleProc = {'nom': nom, 'type':'PROCEDURE', 'ligneDepart': ligneDepart}
-        self.table.apend(nouvelleProc)
+        self.table.append(nouvelleProc)
 
     #permet de vérifier si une variable est dans la TDI (pour l'instant, il faudra changer avec la portée de la variable)
     def contient(self, variable):
