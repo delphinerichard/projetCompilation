@@ -8,7 +8,7 @@ def program(i, errors) :
         debutProg(2, errors)
     else :
         errors = True
-        print ("Erreur : le programme ne commence pas par debutProg")
+        print ("Erreur : le programme ne commence pas par debutProg\n")
         
 
 def debutProg(i, errors):
@@ -20,7 +20,9 @@ def debutProg(i, errors):
 
         # Operations unaires	
         elif("moins" == lignes[i]):
-            moins()
+            tmp = moins()
+            if (tmp == -1):
+                errors = True
             i += 1
         elif("non" == lignes[i]):
             not_logique()
@@ -35,16 +37,24 @@ def debutProg(i, errors):
 
         # Operateurs binaires
         elif("add" == lignes[i]):
-            addition()
+            tmp = addition()
+            if (tmp == -1):
+                errors = True
             i += 1
         elif("mult" == lignes[i]):
-            mult()
+            tmp = mult()
+            if (tmp == -1):
+                errors = True
             i += 1
         elif("div" == lignes[i]):
-            div()
+            tmp = div()
+            if (tmp == -1):
+                errors = True
             i += 1
         elif("sous" == lignes[i]):
-            sous()
+            tmp = sous()
+            if (tmp == -1):
+                errors = True
             i += 1
         elif("et" == lignes[i]):
             and_logique()
@@ -129,8 +139,14 @@ def reserver(i):
 
 def moins():
     b = pile[int(len(pile)-1)]
-    depiler_pile(pile)
-    empiler_pile(pile, -b)
+    # On vérifie si on fait bien l'opération sur un entier et non pas sur un booléen
+    if (isBool(b)) :
+        print("Error : On ne peut pas donner le nombre opposé d'un booléen.\n")
+        return -1
+    else :
+        depiler_pile(pile)
+        empiler_pile(pile, -b)
+        return 0
 
 def not_logique():
     b = pile[int(len(pile)-1)]
@@ -165,17 +181,17 @@ def affectation():
     if (len(pile)-1>int(adresse)): # On vérifie si l'adresse est valide
         depiler_pile(pile)
     # On vérifie si les types de la variable et de l'élément sont compatibles
-    if ((elt == "True") or (elt == "true") or (elt == "False") or (elt == "false")) : # elt est un booléen
+    if (isBool(elt)) : # elt est un booléen
         # Il faut donc que la variable dépilée soit un booléen
         if(MaTDI.typeFromAddr(adresse) == bool) :
             pile[int(adresse)] = elt
             return 0
         else :
-            print("Error : Les types de la variable et de l'élément à affecter ne sont pas compatibles")
+            print("Error : Les types de la variable et de l'élément à affecter ne sont pas compatibles\n")
             return -1
     else : # elt est un entier
         if(MaTDI.typeFromAddr(adresse) == bool) :
-            print("Error : Les types de la variable et de l'élément à affecter ne sont pas compatibles")
+            print("Error : Les types de la variable et de l'élément à affecter ne sont pas compatibles\n")
             return -1
         else :
             pile[int(adresse)] = elt
@@ -186,8 +202,14 @@ def addition():
     depiler_pile(pile)
     nb2 = pile[int(len(pile)-1)]
     depiler_pile(pile)
-    nb3 = int(nb1)+int(nb2)
-    empiler_pile(pile, nb3)
+    # On vérifie si nb1 et nb2 sont bien des entiers
+    if(isInteger(nb1) and isInteger(nb2)) :
+        nb3 = int(nb1)+int(nb2) # Les "int" ne sont plus nécessaires ici
+        empiler_pile(pile, nb3)
+        return 0
+    else :
+        print("Error : On ne peut pas additionner deux éléments qui ne sont pas des entiers.\n")
+        return -1
 
 def diff():
     nb1 = pile[int(len(pile)-1)]
@@ -202,25 +224,43 @@ def div():
     depiler_pile(pile)
     nb2 = pile[int(len(pile)-1)]
     depiler_pile(pile)
-    nb3 = nb2/nb1
-    print(nb1, nb2, nb3)
-    empiler_pile(pile, nb3)
+    # On vérifie si nb1 et nb2 sont bien des entiers et qu'on ne fait pas de division par 0
+    if(isInteger(nb1) and isInteger(nb2) and (nb2 != 0)) :
+        nb3 = nb2/nb1
+        print(nb1, nb2, nb3)
+        empiler_pile(pile, nb3)
+        return 0
+    else :
+        print("Error : On ne peut pas diviser deux éléments qui ne sont pas des entiers non nuls.\n")
+        return -1
 
 def sous():
     nb1 = pile[int(len(pile)-1)]
     depiler_pile(pile)
     nb2 = pile[int(len(pile)-1)]
     depiler_pile(pile)
-    nb3 = int(nb2)-int(nb1)
-    empiler_pile(pile, nb3)
+    # On vérifie si nb1 et nb2 sont bien des entiers
+    if(isInteger(nb1) and isInteger(nb2)) :
+        nb3 = int(nb2)-int(nb1)
+        empiler_pile(pile, nb3)
+        return 0
+    else :
+        print("Error : On ne peut pas soustraire deux éléments qui ne sont pas des entiers.\n")
+        return -1
 
 def mult():
     nb1 = pile[int(len(pile)-1)]
     depiler_pile(pile)
     nb2 = pile[int(len(pile)-1)]
     depiler_pile(pile)
-    nb3 = int(nb1)*int(nb2)
-    empiler_pile(pile, nb3)
+    # On vérifie si nb1 et nb2 sont bien des entiers
+    if(isInteger(nb1) and isInteger(nb2)) :
+        nb3 = int(nb1)*int(nb2)
+        empiler_pile(pile, nb3)
+        return 0
+    else :
+        print("Error : On ne peut pas diviser deux éléments qui ne sont pas des entiers non nuls.\n")
+        return -1
 
 def egal():
     nb1 = pile[int(len(pile)-1)]
@@ -256,7 +296,7 @@ def put():
     elt = pile[int(len(pile)-1)] # Donne l'élément en sommet de pile
     
     if(MaTDI.isType(elt, bool)) : # L'élément en sommet de pile est un booléen ; on retourne une erreur
-        print("Error : On ne peut pas appliquer l'instruction put à un booléen")
+        print("Error : On ne peut pas appliquer l'instruction put à un booléen\n")
         return (False, -1)
 
     else : # L'élément en sommet de pile n'est pas un booléen
@@ -267,11 +307,11 @@ def get():
     x = input("Tapez une entree puis appuyez sur entree\n")
     if (x == "True" or x == "true") :
         # On interdit le booléen True pour cette instruction
-        print("Error : On ne peut pas appliquer l'instruction get à un booléen")
+        print("Error : On ne peut pas appliquer l'instruction get à un booléen\n")
         return -1
     elif (x == "False" or x == "false") :
         # On interdit le booléen False pour cette instruction
-        print("Error : On ne peut pas appliquer l'instruction get à un booléen")
+        print("Error : On ne peut pas appliquer l'instruction get à un booléen\n")
         return -1
     else :
         empiler_pile(pile, int(x))
@@ -284,6 +324,20 @@ def empiler_pile(pile,x):
 
 def depiler_pile(pile):
     pile.pop()
+
+# On vérifie si l'élément elt est un booléen
+def isBool(elt) :
+    if ((elt == "True") or (elt == "true") or (elt == "False") or (elt == "false")) :
+        return True
+    else :
+        return False
+
+# On vérifie si l'élément elt est un entier
+def isInteger(elt) :
+    if ((elt == "True") or (elt == "true") or (elt == "False") or (elt == "false")) :
+        return False
+    else :
+        return True
     
 
 ########################################################################				 	

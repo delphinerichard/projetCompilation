@@ -191,6 +191,7 @@ def instr(lexical_analyser):
 	if lexical_analyser.isKeyword("while"):
 		boucle(lexical_analyser)
 	elif lexical_analyser.isKeyword("if"):
+		print(lexical_analyser)
 		altern(lexical_analyser)
 	elif lexical_analyser.isKeyword("get") or lexical_analyser.isKeyword("put"):
 		es(lexical_analyser)
@@ -613,7 +614,8 @@ def main():
 code = open("tests/code.txt", "w")
 code.truncate(0)
 compteur = 0
-identifierTable = tdi() # On utilise notre propre TDI (voir fichier tdi.py)
+identifierTable = []
+#identifierTable = tdi() # On utilise notre propre TDI (voir fichier tdi.py)
 			 
 
 if __name__ == "__main__":
