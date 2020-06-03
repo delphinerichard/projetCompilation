@@ -9,20 +9,23 @@ class tdi:
         self.table = []
 
     #ajout d'une variable dans la TDI
-    def ajoutVar(self, nom, type, portee, adresse):
+    #nom: nom de la variable ; type: type de la variable ; portee: main ou nom de la fonction dans laquelle elle est declaree 
+    def ajoutVar(self, nom, type, portee):
         if(self.contient(nom)):
             raise Exception("Le nom de cette variable est deja utilise")
         else:
-            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'adresse': adresse}
+            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'fonctionOrigine': fonctionOrigine}
             self.table.append(nouvelleVar)
 
     #ajout de l'identificateur d'une fonction dans la TDI
-    def ajoutFonc(self, nom, portee, nomArg, modePassage, typeRes):
-            nouvelleFonc = {'nom': nom, 'portee': portee, 'nomArg': nomArg, 'modePassage': modePassage, 'typeRes': typeRes}
+    # nom: nom de la fonction ; nomArg: tableau avec les noms des arguments de la fonction - pabesoin a priori, typeRes: type du résultat
+    def ajoutFonc(self, nom, typeRes):
+            nouvelleFonc = {'nom': nom, 'type':'FONCTION' 'portee': portee, 'nomArg': nomArg, 'modePassage': modePassage, 'typeRes': typeRes}
             self.table.append(nouvelleFonc)
 
     #Ajout d'un argument dans la TDI
-    def ajoutArg(self, nom, type, adresse):
+    #nom: nom de l'argument ; type: son type ; modePassage: in/out ; fonction: le nom de la fonction d'origine
+    def ajoutArg(self, nom, type, modePassage, fonction):
         nouvelArg = {'nom': nom, 'type': type, 'portee': "ARG", 'adresse': adresse}
         self.table.append(nouvelArg)
 
@@ -54,7 +57,7 @@ class tdi:
         if not (self.contient(variable)):
             raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
         else:
-            for i in range(0, len(self.table)-1):
+            for i in range(0, len(self.table)):
                 if(table[i]["nom"] == variable):
                     return i
 
