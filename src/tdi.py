@@ -49,14 +49,18 @@ class tdi:
             for i in self.table:
                 if(i["nom"] == variable):
                     return i["type"]
-
+        
+    
     def noLigne(self, variable):
         if not (self.contient(variable)):
             raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
         else:
             for i in range(0, len(self.table)-1):
-                if(table[i]["nom"] == variable):
+                if(self.table[i]["nom"] == variable):
                     return i
+                
+    def afficherTable(self):
+        return self.table
 
     #renvoie le type de la variable qui correspond a l'adresse en parametre
     def typeFromAddr(self, addr):
@@ -64,3 +68,5 @@ class tdi:
             raise Exception("Il n'y a pas de variable à l'adresse {}".format(addr))
         else:
             return self.table[addr]["type"]
+
+
