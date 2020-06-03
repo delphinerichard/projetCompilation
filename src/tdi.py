@@ -26,7 +26,7 @@ class tdi:
         nouvelArg = {'nom': nom, 'type': type, 'portee': "ARG", 'adresse': adresse}
         self.table.append(nouvelArg)
 
-    #permet de vérifier si une variable est dans la TDI (pour l'instant, il faudra changer avec la portée de la variable)
+    #permet de verifier si une variable est dans la TDI (pour l'instant, il faudra changer avec la portee de la variable)
     def contient(self, variable):
         for i in self.table:
             if(i["nom"] == variable):
@@ -65,7 +65,7 @@ class tdi:
     #renvoie le type de la variable qui correspond a l'adresse en parametre
     def typeFromAddr(self, addr):
         if (len(self.table) > addr):
-            raise Exception("Il n'y a pas de variable à l'adresse {}".format(addr))
+            raise Exception("Il n'y a pas de variable a l'adresse {}".format(addr))
         else:
             return self.table[addr]["type"]
 

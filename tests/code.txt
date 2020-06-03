@@ -1,6 +1,5 @@
 
 debutProg
-<<<<<<< HEAD
 tra(21)
 empilerAd(0)
 valeurPile
@@ -23,16 +22,5 @@ retourFonc
 reserverBloc
 empiler(3)
 traStat(3,1)
-=======
-tra(8)
-empiler(2)
-empilerAd(None)
-valeurPile
-mult
-retourFonc
-reserverBloc
-empiler(7)
-traStat(0, 1)
->>>>>>> manon
 put
 finProg
