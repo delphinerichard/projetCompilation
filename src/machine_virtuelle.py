@@ -56,10 +56,10 @@ def debutProg(i):
 
 		# Operation d'empilement
 		elif("empilerParam(" in lignes[i]):
-			empiler_pile(base+retrouver_parametres(lignes[i])[0])
+			empilerParam(retrouver_parametres(lignes[i])[0])
 			i += 1
 		elif("empilerAd(" in lignes[i]):
-			empiler_pile(base+retrouver_parametres(lignes[i])[0]+nbParam)
+			empiler_pile(base+retrouver_parametres(lignes[i])[0])
 			i += 1
 		elif("empiler(" in lignes[i]):
 			empiler_pile(retrouver_parametres(lignes[i])[0])
@@ -269,6 +269,18 @@ def get():
 	empiler_pile(int(input("Tapez une entree puis appuyez sur entree\n")))
 	affectation()
 
+def empilerParam(i):
+	if len(param) > i:
+		if param[i] == -1:
+			param[i] = len(pile)
+		empiler_pile(param[i])
+	else:
+		while len(param) < i:
+			param.append(-1)
+		param.append(len(pile))
+		empiler_pile(param[i])
+		
+
 def valeurPile():
 	adresse = pile[len(pile)-1]
 	depiler_pile()
@@ -293,6 +305,7 @@ def main():
 
 ########################################################################
 pile=[]
+param=[]
 
 
 filename = sys.argv[1]
@@ -307,4 +320,4 @@ fichier_entier = f.read()
 lignes = fichier_entier.split("\n")
 
 if __name__ == "__main__":
-    main() 
+	main() 

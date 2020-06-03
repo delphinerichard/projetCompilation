@@ -1,7 +1,7 @@
 
 debutProg
 tra(21)
-empilerParam(0)
+empilerAd(0)
 valeurPile
 empiler(0)
 egal
@@ -9,10 +9,10 @@ tze(11)
 empiler(1)
 retourFonct
 tra(21)
-empilerParam(0)
+empilerAd(0)
 valeurPile
 reserverBloc
-empilerParam(0)
+empilerAd(0)
 valeurPile
 empiler(1)
 sous
@@ -20,7 +20,7 @@ traStat(3,1)
 mult
 retourFonct
 reserverBloc
-empiler(3)
+empiler(1000)
 traStat(3,1)
 put
 finProg
