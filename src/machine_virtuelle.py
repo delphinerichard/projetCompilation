@@ -143,7 +143,7 @@ def retrouver_parametres(ligne):
 		elif(i == ")"):
 			tab.append(tmp)
 			number = False
-		elif(number):
+		elif(number and i != " "):
 			tmp *= 10
 			tmp += int(i)
 	return tab
