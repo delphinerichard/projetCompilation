@@ -15,7 +15,7 @@ class tdi:
         if(self.contient(nom)):
             raise Exception("Le nom de cette variable est deja utilise")
         else:
-            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee}
+            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'modePassage':'None'}
             self.table.append(nouvelleVar)
 
  
@@ -35,7 +35,7 @@ class tdi:
         #nom: nom de la procedure ; ligneDepart : la ligne de depart dans code.txt
     def ajoutProc(self, nom, ligneDepart):
         nouvelleProc = {'nom': nom, 'type':'PROCEDURE', 'ligneDepart': ligneDepart}
-        self.table.apend(nouvelleProc)
+        self.table.append(nouvelleProc)
 
     #permet de verifier si une variable est dans la TDI (pour l'instant, il faudra changer avec la portee de la variable)
     def contient(self, variable):
@@ -88,3 +88,11 @@ class tdi:
             for i in self.table:
                 if((i["type"] == "PROCEDURE" or i["type"] == "FONCTION") and i["nom"] == variable):
                     return i["ligneDepart"]
+
+    def getModePassage(self, variable):
+        if not (self.contient(variable)):
+            raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
+        else:
+            for i in self.table:
+                if((i["type"] != "PROCEDURE" and i["type"] != "FONCTION") and i["nom"] == variable):
+                    return i["modePassage"]

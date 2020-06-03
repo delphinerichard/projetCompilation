@@ -1,0 +1,18 @@
+procedure pp4 is
+  k,i,som:integer;
+begin
+  get(i);
+  k:=0;
+  som:=0;
+  //Invariant :
+    //som est le nombre de valeurs paires lues
+  while k<=i loop
+    if (k/2)*2=k then
+      som:=som+k
+    else
+        som:=som+1
+    end;
+    k:=k+1
+  end;
+  put(som)
+end.
