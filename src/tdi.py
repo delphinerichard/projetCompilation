@@ -11,11 +11,11 @@ class tdi:
 
     #ajout d'une variable dans la TDI
     #nom: nom de la variable ; type: type de la variable ; portee: main ou nom de la fonction dans laquelle elle est declaree
-    def ajoutVar(self, nom, type, portee):
+    def ajoutVar(self, nom, type, portee, adresse):
         if(self.contient(nom)):
             raise Exception("Le nom de cette variable est deja utilise")
         else:
-            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'modePassage':'None'}
+            nouvelleVar = {'nom': nom, 'type': type, 'portee': portee, 'modePassage':'None', 'adresse': adresse}
             self.table.append(nouvelleVar)
 
  
@@ -27,8 +27,8 @@ class tdi:
 
     #Ajout d'un argument dans la TDI
     #nom: nom de l'argument ; type: son type ; modePassage: in ou in/out ; fonction: le nom de la fonction d'origine
-    def ajoutArg(self, nom, type, modePassage, fonction):
-        nouvelArg = {'nom': nom, 'type': type, 'modePassage': modePassage, 'fonction': fonction}
+    def ajoutArg(self, nom, type, modePassage, fonction, adresse):
+        nouvelArg = {'nom': nom, 'type': type, 'modePassage': modePassage, 'fonction': fonction, 'adresse': adresse}
         self.table.append(nouvelArg)
 
         #Ajout d'une procedure dans la TDI
@@ -96,3 +96,12 @@ class tdi:
             for i in self.table:
                 if((i["type"] != "PROCEDURE" and i["type"] != "FONCTION") and i["nom"] == variable):
                     return i["modePassage"]
+
+
+    def getAdresse(self, variable):
+        if not (self.contient(variable)):
+            raise Exception("la variable {} n'existe pas dans la table des identificateurs".format(variable))
+        else:
+            for i in self.table:
+                if((i["type"] != "PROCEDURE" and i["type"] != "FONCTION") and i["nom"] == variable):
+                    return i["adresse"]

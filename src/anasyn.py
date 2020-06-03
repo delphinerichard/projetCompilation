@@ -60,7 +60,7 @@ def partieDecla(lexical_analyser):
 	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
 		listeDeclaOp(lexical_analyser)
 	if not lexical_analyser.isKeyword("begin") :
-    		listeDeclaVar(lexical_analyser)               
+    		listeDeclaVar(lexical_analyser, 0)               
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -79,7 +79,7 @@ def procedure(lexical_analyser):
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of procedure : "+ident)
        
-	partieFormelle(lexical_analyser)
+	partieFormelle(lexical_analyser, ident)
 
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutProc(ident, numero_ligne()+2)
@@ -92,7 +92,7 @@ def fonction(lexical_analyser):
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of function : "+ident)
 	
-	partieFormelle(lexical_analyser)
+	partieFormelle(lexical_analyser, ident)
 	
 	lexical_analyser.acceptKeyword("return")
 	typ = nnpType(lexical_analyser)
@@ -124,19 +124,19 @@ def corpsFonct(lexical_analyser):
 	modif_ligne(lieu_tra, "tra("+str(lieu_retour+1)+")")
 	lexical_analyser.acceptKeyword("end")
 
-def partieFormelle(lexical_analyser):
+def partieFormelle(lexical_analyser, nom):
 	lexical_analyser.acceptCharacter("(")
 	if not lexical_analyser.isCharacter(")"):
-		listeSpecifFormelles(lexical_analyser)
+		listeSpecifFormelles(lexical_analyser, 0, nom)
 	lexical_analyser.acceptCharacter(")")
 
-def listeSpecifFormelles(lexical_analyser):
-	specif(lexical_analyser)
+def listeSpecifFormelles(lexical_analyser, compteurArg, nom):
+	specif(lexical_analyser, compteurArg, nom)
 	if not lexical_analyser.isCharacter(")"):
 		lexical_analyser.acceptCharacter(";")
-		listeSpecifFormelles(lexical_analyser)
+		listeSpecifFormelles(lexical_analyser, compteurArg+1, nom)
 
-def specif(lexical_analyser):
+def specif(lexical_analyser, compteurArg, nom):
 	listeIdent(lexical_analyser, [])
 	lexical_analyser.acceptCharacter(":")
 	if lexical_analyser.isKeyword("in"):
@@ -144,7 +144,7 @@ def specif(lexical_analyser):
                 
 	typeVar = nnpType(lexical_analyser)
 	for i in range (len(liste)):
-		identifierTable.ajoutArg(liste[i], typeVar, mde, "")
+		identifierTable.ajoutArg(liste[i], typeVar, mde, nom, compteurArg)
 
 
 def mode(lexical_analyser):
@@ -173,21 +173,21 @@ def nnpType(lexical_analyser):
 	return typeVar
 
 def partieDeclaProc(lexical_analyser):
-	listeDeclaVar(lexical_analyser)
+	listeDeclaVar(lexical_analyser, 0)
 
-def listeDeclaVar(lexical_analyser):
-	declaVar(lexical_analyser)
+def listeDeclaVar(lexical_analyser, compteurVar):
+	declaVar(lexical_analyser, compteurVar)
 	if lexical_analyser.isIdentifier():
-		listeDeclaVar(lexical_analyser)
+		listeDeclaVar(lexical_analyser, compteurVar+1)
 
-def declaVar(lexical_analyser):
+def declaVar(lexical_analyser, compteurVar):
 	listeIdent(lexical_analyser, [])
 	code.write("reserver("+str(compteur+1)+")\n")
 	lexical_analyser.acceptCharacter(":")
 	logger.debug("now parsing type...")
 	typeVar = nnpType(lexical_analyser)
 	for i in range(len(liste)):
-		identifierTable.ajoutVar(liste[i], typeVar, "main")
+		identifierTable.ajoutVar(liste[i], typeVar, "main", i+compteurVar)
 	lexical_analyser.acceptCharacter(";")
 
 def listeIdent(lexical_analyser, listeident):
@@ -225,12 +225,12 @@ def instr(lexical_analyser):
 		ident = lexical_analyser.acceptIdentifier()
 		if lexical_analyser.isSymbol(":="):
 			if (identifierTable.getModePassage(ident) == "in out"):
-				code.write("empilerParam("+str(identifierTable.noLigne(ident))+")\n")
+				code.write("empilerParam("+str(identifierTable.getAdresse(ident))+")\n")
 			else :
 				if (identifierTable.getModePassage(ident) == "in"):
-					code.write("empilerAd("+str(identifierTable.noLigne(ident))+")\n")
+					code.write("empilerAd("+str(identifierTable.getAdresse(ident))+")\n")
 				else :
-					code.write("empiler("+str(identifierTable.noLigne(ident))+")\n")
+					code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
 			lexical_analyser.acceptSymbol(":=")
 			expression(lexical_analyser)
 			code.write("affectation\n")
@@ -428,12 +428,12 @@ def elemPrim(lexical_analyser):
 		else:
 			logger.debug("Use of an identifier as an expression: " + ident)
 			if (identifierTable.getModePassage(ident) == "in out"):
-				code.write("empilerParam("+str(identifierTable.noLigne(ident))+")\n")
+				code.write("empilerParam("+str(identifierTable.getAdresse(ident))+")\n")
 			else :
 				if (identifierTable.getModePassage(ident) == "in"):
-					code.write("empilerAd("+str(identifierTable.noLigne(ident))+")\n")
+					code.write("empilerAd("+str(identifierTable.getAdresse(ident))+")\n")
 				else :
-					code.write("empiler("+str(identifierTable.noLigne(ident))+")\n")
+					code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
 			code.write("valeurPile\n")
 	else:
 		logger.error("Unknown Value!")
@@ -471,7 +471,7 @@ def es(lexical_analyser):
 		lexical_analyser.acceptKeyword("get")
 		lexical_analyser.acceptCharacter("(")
 		ident = lexical_analyser.acceptIdentifier()
-		code.write("empiler("+str(identifierTable.noLigne(ident))+")\n")
+		code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
 		lexical_analyser.acceptCharacter(")")
 		code.write("get\n")
 		logger.debug("Call to get "+ident)
