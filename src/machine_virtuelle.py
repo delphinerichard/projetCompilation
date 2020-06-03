@@ -109,7 +109,7 @@ def debutProg(i):
 			pile[base - 2] = nbParam
 			pile[base - 1] = i + 1
 			i = paramTraStat[0]
-		elif("retourFonct" == lignes[i]):
+		elif("retourFonc" in lignes[i]):
 			tmp = pile[len(pile)-1]
 			while(len(pile)>base):
 				depiler_pile()
@@ -248,7 +248,7 @@ def infeg():
 	if(int(nb2)<=int(nb1)):
 		empiler_pile(True)
 	else:
-		empiler_pile(False)
+		empiler_pile(False)	
 
 def sup():
 	nb1 = pile[int(len(pile)-1)]
