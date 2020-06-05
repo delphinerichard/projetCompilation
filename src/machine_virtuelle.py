@@ -229,10 +229,7 @@ def put():
 
 def get():
 	empiler_pile(pile, int(input("Tapez une entree puis appuyez sur entree\n")))
-<<<<<<< HEAD
 	print(pile)
-=======
->>>>>>> 789e1f29c2bc838a5ed5d007e8e86749936ac9d5
 	affectation()
 
 def empiler_pile(pile,x):

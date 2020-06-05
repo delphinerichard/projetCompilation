@@ -166,10 +166,11 @@ def nnpType(lexical_analyser):
 	elif lexical_analyser.isKeyword("boolean"):
 		lexical_analyser.acceptKeyword("boolean")
 		typeVar = "boolean"
-		logger.debug("boolean type")                
+		logger.debug("boolean type")
 	else:
-		logger.error("Unknown type found <"+ lexical_analyser.get_value() +">!")
-		raise AnaSynException("Unknown type found <"+ lexical_analyser.get_value() +">!")
+		msg = "Error : Une variable doit avoir un type connu ('integer' ou 'boolean') a sa declaration."
+		logger.error(msg)
+		raise AnaSynException(msg)
 	return typeVar
 
 def partieDeclaProc(lexical_analyser):
@@ -223,6 +224,7 @@ def instr(lexical_analyser):
 		retour(lexical_analyser)
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
+		typeIdent = identifierTable.getType(ident)
 		if lexical_analyser.isSymbol(":="):
 			if (identifierTable.getModePassage(ident) == "in out"):
 				code.write("empilerParam("+str(identifierTable.getAdresse(ident))+")\n")
@@ -232,7 +234,11 @@ def instr(lexical_analyser):
 				else :
 					code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
 			lexical_analyser.acceptSymbol(":=")
-			expression(lexical_analyser)
+			typeElt = expression(lexical_analyser)
+			if(typeIdent != typeElt) :
+				msg = "Error : On ne peut affecter un element à une variable d'un type different."
+				logger.error(msg)
+				raise AnaSynException(msg)
 			code.write("affectation\n")
 			logger.debug("parsed affectation")
 		elif lexical_analyser.isCharacter("("):
@@ -258,7 +264,7 @@ def instr(lexical_analyser):
 
 
 def listePe(lexical_analyser):
-	expression(lexical_analyser)
+	typeElt = expression(lexical_analyser)
 	if lexical_analyser.isCharacter(","):
 		lexical_analyser.acceptCharacter(",")
 		listePe(lexical_analyser)
@@ -266,36 +272,78 @@ def listePe(lexical_analyser):
 def expression(lexical_analyser):
 	logger.debug("parsing expression: " + str(lexical_analyser.get_value()))
 
-	exp1(lexical_analyser)
+	typeElt = exp1(lexical_analyser)
 	if lexical_analyser.isKeyword("or"):
+		# On doit avoir des booleens
+		if(typeElt != 'boolean') : 
+			msg = "Error : On ne peut faire une instruction 'or' qu'avec des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		lexical_analyser.acceptKeyword("or")
-		exp1(lexical_analyser)
+		typeElt2 = exp1(lexical_analyser)
+		if(typeElt2 != 'boolean') : 
+			msg = "Error : On ne peut faire une instruction 'or' qu'avec des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		code.write("ou\n")
+		# Si on a bien deux booleens, on aura une expression booleenne
+		typeElt = 'boolean'
+	return typeElt
         
 def exp1(lexical_analyser):
 	logger.debug("parsing exp1")
 	
-	exp2(lexical_analyser)
+	typeElt = exp2(lexical_analyser)
 	if lexical_analyser.isKeyword("and"):
+		# On doit avoir des booleens
+		if(typeElt != 'boolean') : 
+			msg = "Error : On ne peut faire une instruction 'and' qu'avec des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		lexical_analyser.acceptKeyword("and")
-		exp2(lexical_analyser)
+		typeElt2 = exp2(lexical_analyser)
+		if(typeElt2 != 'boolean') : 
+			msg = "Error : On ne peut faire une instruction 'and' qu'avec des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		code.write("et\n")
+		# S'il y a un and, on aura une expression booleenne
+		typeElt = 'boolean'
+	return typeElt
         
 def exp2(lexical_analyser):
 	logger.debug("parsing exp2")
-	exp3(lexical_analyser)
+	typeElt = exp3(lexical_analyser)
 	if	lexical_analyser.isSymbol("<") or \
 		lexical_analyser.isSymbol("<=") or \
 		lexical_analyser.isSymbol(">") or \
 		lexical_analyser.isSymbol(">="):
+		if(typeElt != 'integer') : # On n'a pas un entier
+			msg = "Error : On ne peut faire des tests d'inferiorite ou de superiorite qu'entre des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		op = opRel(lexical_analyser)
-		exp3(lexical_analyser)
+		typeElt2 = exp3(lexical_analyser)
+		if(typeElt != 'integer') : # On n'a pas un entier
+			msg = "Error : On ne peut faire des tests d'inferiorite ou de superiorite qu'entre des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		code.write(str(op))
+		# Une comparaison renvoyant un booleen, notre element devient un booleen
+		typeElt = 'boolean'
 	elif lexical_analyser.isSymbol("=") or \
 		lexical_analyser.isSymbol("/="): 
 		op = opRel(lexical_analyser)
-		exp3(lexical_analyser)
+		typeElt2 = exp3(lexical_analyser)
+		# Les deux elements doivent etre du meme type pour pouvoir comparer
+		if(typeElt != typeElt2) :
+			msg = "Error : On ne peut faire des tests d'egalite avec des elements de types differents."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		code.write(str(op))
+		# Une comparaison renvoyant un booleen, notre element devient un booleen
+		typeElt = 'boolean'
+	return typeElt
 	
 def opRel(lexical_analyser):
 	logger.debug("parsing relationnal operator: " + lexical_analyser.get_value())
@@ -331,11 +379,20 @@ def opRel(lexical_analyser):
 
 def exp3(lexical_analyser):
 	logger.debug("parsing exp3")
-	exp4(lexical_analyser)	
+	typeElt = exp4(lexical_analyser)	
 	if lexical_analyser.isCharacter("+") or lexical_analyser.isCharacter("-"):
+		if(typeElt != 'integer') : # On n'a pas un entier
+			msg = "Error : On ne peut faire des additions ou des soustractions qu'entre des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		op = opAdd(lexical_analyser)
-		exp4(lexical_analyser)
+		typeElt2 = exp4(lexical_analyser)
+		if(typeElt2 != 'integer') : # On n'a pas un entier
+			msg = "Error : On ne peut faire des additions ou des soustractions qu'entre des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		code.write(str(op)+"\n")
+	return typeElt
 
 def opAdd(lexical_analyser):
 	logger.debug("parsing additive operator: " + lexical_analyser.get_value())
@@ -354,11 +411,23 @@ def opAdd(lexical_analyser):
 def exp4(lexical_analyser):
 	logger.debug("parsing exp4")
         
-	prim(lexical_analyser)	
-	if lexical_analyser.isCharacter("*") or lexical_analyser.isCharacter("/"):
-		op = opMult(lexical_analyser)
-		prim(lexical_analyser)
-		code.write(str(op)+"\n")
+	typeElt = prim(lexical_analyser)	
+	if lexical_analyser.isCharacter("*") or lexical_analyser.isCharacter("/"): 
+		# On ne peut faire les operations que sur des entiers
+		if (typeElt != 'integer'):
+			msg = "Error : On ne peut faire des multiplications ou des divisions qu'entre des entiers."
+			logger.error(msg)
+			raise AnaSynException(msg)
+		else :
+			op = opMult(lexical_analyser)
+			typeElt2 = prim(lexical_analyser)
+			if(typeElt2 != 'integer') :
+				msg = "Error : On ne peut faire des multiplications ou des divisions qu'entre des entiers."
+				logger.error(msg)
+				raise AnaSynException(msg)
+			code.write(str(op)+"\n")
+	return typeElt
+	
 
 def opMult(lexical_analyser):
 	logger.debug("parsing multiplicative operator: " + lexical_analyser.get_value())
@@ -380,9 +449,10 @@ def prim(lexical_analyser):
 	op = ""
 	if lexical_analyser.isCharacter("+") or lexical_analyser.isCharacter("-") or lexical_analyser.isKeyword("not"):
 		op = opUnaire(lexical_analyser)
-	elemPrim(lexical_analyser)
+	typeElt = elemPrim(lexical_analyser)
 	if(op != ""):
 		code.write(str(op))
+	return typeElt
 
 def opUnaire(lexical_analyser):
 	logger.debug("parsing unary operator: " + lexical_analyser.get_value())
@@ -403,16 +473,22 @@ def opUnaire(lexical_analyser):
 		logger.error(msg)
 		raise AnaSynException(msg)
 
-def elemPrim(lexical_analyser):
+def elemPrim(lexical_analyser): # Cette fonction renvoie le type de l'element primitif analyse ('integer' ou 'boolean')
 	logger.debug("parsing elemPrim: " + str(lexical_analyser.get_value()))
 	if lexical_analyser.isCharacter("("):
 		lexical_analyser.acceptCharacter("(")
-		expression(lexical_analyser)
+		typeElt = expression(lexical_analyser)
 		lexical_analyser.acceptCharacter(")")
-	elif lexical_analyser.isInteger() or lexical_analyser.isKeyword("true") or lexical_analyser.isKeyword("false"):
+		return typeElt
+	elif lexical_analyser.isInteger() :
 		valeur(lexical_analyser)
+		return 'integer'
+	elif lexical_analyser.isKeyword("true") or lexical_analyser.isKeyword("false") :
+		valeur(lexical_analyser)
+		return 'boolean'
 	elif lexical_analyser.isIdentifier():
 		ident = lexical_analyser.acceptIdentifier()
+		typeIdent = identifierTable.getType(ident)
 		if lexical_analyser.isCharacter("("):			# Appel fonct
 			lexical_analyser.acceptCharacter("(")
 			code.write("reserverBloc\n")
@@ -435,6 +511,7 @@ def elemPrim(lexical_analyser):
 				else :
 					code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
 			code.write("valeurPile\n")
+		return typeIdent
 	else:
 		logger.error("Unknown Value!")
 		raise AnaSynException("Unknown Value!")
@@ -471,15 +548,25 @@ def es(lexical_analyser):
 		lexical_analyser.acceptKeyword("get")
 		lexical_analyser.acceptCharacter("(")
 		ident = lexical_analyser.acceptIdentifier()
-		code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
-		lexical_analyser.acceptCharacter(")")
-		code.write("get\n")
-		logger.debug("Call to get "+ident)
+		# On teste si l'identifieur est bien un entier
+		if (identifierTable.getType(ident) == 'integer') :
+			code.write("empiler("+str(identifierTable.getAdresse(ident))+")\n")
+			lexical_analyser.acceptCharacter(")")
+			code.write("get\n")
+			logger.debug("Call to get "+ident)
+		else :
+			msg = "Error : On ne peut pas appliquer l'instruction get à un booléen."
+			logger.error(msg)
+			raise AnaSynException(msg)
 	elif lexical_analyser.isKeyword("put"):
 		lexical_analyser.acceptKeyword("put")
 		lexical_analyser.acceptCharacter("(")
-		expression(lexical_analyser)
+		typeElt = expression(lexical_analyser)
 		lexical_analyser.acceptCharacter(")")
+		if(typeElt == 'boolean') : 
+			msg = "Error : On ne peut pas appliquer l'instruction put à un booléen."
+			logger.error(msg)
+			raise AnaSynException(msg)
 		code.write("put\n")
 		logger.debug("Call to put")
 	else:
@@ -491,7 +578,11 @@ def boucle(lexical_analyser):
 	lexical_analyser.acceptKeyword("while")
 
 	lieu_debut = numero_ligne()+1
-	expression(lexical_analyser)
+	typeElt = expression(lexical_analyser)
+	if(typeElt != 'boolean'):
+		msg = "Error : On ne peut pas appliquer l'instruction while sur une condition non booleenne."
+		logger.error(msg)
+		raise AnaSynException(msg)
 
 	code.write("tze\n")
 	lieu_tze = numero_ligne()
@@ -511,7 +602,12 @@ def altern(lexical_analyser):
 	sinon = False
 	logger.debug("parsing if: ")
 	lexical_analyser.acceptKeyword("if")
-	expression(lexical_analyser)
+	typeElt = expression(lexical_analyser)
+	if(typeElt != 'boolean'):
+		msg = "Error : On ne peut pas appliquer l'instruction if sur une condition non booleenne."
+		logger.error(msg)
+		raise AnaSynException(msg)
+
 	code.write("tze\n")
 
 	lieu_tze = numero_ligne()
