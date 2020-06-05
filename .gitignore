@@ -1,4 +1,7 @@
 
 .idea/
 
+
 *.pyc
+
+tests/code.txt

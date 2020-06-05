@@ -200,7 +200,7 @@ class LexicalAnalyser(object):
 		char = re.compile("[a-zA-Z]")
 		beginColIndex = 0
 		c = ''
-		colIndex = 0;
+		colIndex = 0
 		while colIndex < len(line):
 			c = line[colIndex]
 			unitValue = None
