@@ -123,6 +123,18 @@ def debutProg(i):
 				nbParam = pile[base-2]
 			depiler_pile()
 			empiler_pile(tmp)
+		elif("retourProc" in lignes[i]):
+			while(len(pile)>base):
+				depiler_pile()
+			i = pile[len(pile)-1]
+			depiler_pile()
+			base = pile[len(pile)-2]
+			depiler_pile()
+			if(base==0):
+				nbParam = 0
+			else:
+				nbParam = pile[base-2]
+			depiler_pile()
 
 		# Erreurs
 		else:
