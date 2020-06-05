@@ -10,7 +10,6 @@ def debutProg(i):
 	base = 0
 	nbParam = 0
 	while (not("finProg" in lignes[i])):
-		print(pile, i+1)
 		# Reserve de la place pour les variables et fonctions
 		if ("reserver(" in lignes[i]):
 			reserver(retrouver_parametres(lignes[i])[0])
