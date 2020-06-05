@@ -138,7 +138,7 @@ def listeSpecifFormelles(lexical_analyser, compteurArg, nom):
 		listeSpecifFormelles(lexical_analyser, compteurArg+1, nom)
 
 def specif(lexical_analyser, compteurArg, nom):
-	listeIdent(lexical_analyser, [])
+	listeIdent(lexical_analyser, [], 0)
 	lexical_analyser.acceptCharacter(":")
 	if lexical_analyser.isKeyword("in"):
 		mde = mode(lexical_analyser)
@@ -182,7 +182,7 @@ def listeDeclaVar(lexical_analyser, compteurVar, nom):
 		listeDeclaVar(lexical_analyser, compteurVar+1, nom)
 
 def declaVar(lexical_analyser, compteurVar, nom):
-	listeIdent(lexical_analyser, [])
+	listeIdent(lexical_analyser, [], 0)
 	code.write("reserver("+str(compteur+1)+")\n")
 	lexical_analyser.acceptCharacter(":")
 	logger.debug("now parsing type...")
@@ -194,17 +194,17 @@ def declaVar(lexical_analyser, compteurVar, nom):
 			identifierTable.ajoutVar(liste[i], typeVar, "main", i+compteurVar)
 	lexical_analyser.acceptCharacter(";")
 
-def listeIdent(lexical_analyser, listeident):
+def listeIdent(lexical_analyser, listeident, cpt):
 	global compteur
 	global liste
 	ident = lexical_analyser.acceptIdentifier()
 	listeident.append(ident)
 	liste = listeident
+	compteur = cpt
 	logger.debug("identifier found: "+str(ident))
 	if lexical_analyser.isCharacter(","):
-		compteur += 1
 		lexical_analyser.acceptCharacter(",")
-		listeIdent(lexical_analyser, listeident)
+		listeIdent(lexical_analyser, listeident, cpt + 1)
 
 def suiteInstrNonVide(lexical_analyser):
 	instr(lexical_analyser)
