@@ -3,3 +3,5 @@
 
 
 *.pyc
+
+tests/code.txt
