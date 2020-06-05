@@ -415,14 +415,14 @@ def exp4(lexical_analyser):
 	typeElt = prim(lexical_analyser)
 	if lexical_analyser.isCharacter("*") or lexical_analyser.isCharacter("/"):
 		# On ne peut faire les operations que sur des entiers
-		if (typeElt != 'integer'):
+		if (typeElt != 'integer' and typeElt2 != 'FONCTION' and typeElt2 != 'PROCEDURE'):
 			msg = "Error : On ne peut faire des multiplications ou des divisions qu'entre des entiers."
 			logger.error(msg)
 			raise AnaSynException(msg)
 		else :
 			op = opMult(lexical_analyser)
 			typeElt2 = prim(lexical_analyser)
-			if(typeElt2 != 'integer') :
+			if(typeElt2 != 'integer' and typeElt2 != 'FONCTION' and typeElt2 != 'PROCEDURE') :
 				msg = "Error : On ne peut faire des multiplications ou des divisions qu'entre des entiers."
 				logger.error(msg)
 				raise AnaSynException(msg)
