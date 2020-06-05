@@ -5,7 +5,8 @@
 #
 
 
-#
+# Gestion des valeurPile pour un appel de procedure avec empilerParam 
+# (pas de valeurPile pour un in out) -> il y a un valeurPile integre dans empilerParam
 
 import sys, argparse, re
 import logging
