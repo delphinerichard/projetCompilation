@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
 ## 	@package anasyn
-# 	Syntactical Analyser package. 
+# 	Syntactical Analyser package.
 #
 
 
-# Gestion des valeurPile pour un appel de procedure avec empilerParam 
+# Gestion des valeurPile pour un appel de procedure avec empilerParam
 # (pas de valeurPile pour un in out) -> il y a un valeurPile integre dans empilerParam
 
 import sys, argparse, re
@@ -26,20 +26,20 @@ class AnaSynException(Exception):
 	def __str__(self):
                 return repr(self.value)
 
-########################################################################				 	
+########################################################################
 #### Syntactical Diagrams
-########################################################################				 	
+########################################################################
 
 def program(lexical_analyser):
 	specifProgPrinc(lexical_analyser)
 	lexical_analyser.acceptKeyword("is")
 	corpsProgPrinc(lexical_analyser)
-	
+
 def specifProgPrinc(lexical_analyser):
 	lexical_analyser.acceptKeyword("procedure")
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of program : "+ident)
-	
+
 def  corpsProgPrinc(lexical_analyser):
 	code.write("\ndebutProg\n")
 	if not lexical_analyser.isKeyword("begin"):
@@ -56,12 +56,12 @@ def  corpsProgPrinc(lexical_analyser):
 	code.write("finProg")
 	lexical_analyser.acceptFel()
 	logger.debug("End of program")
-	
+
 def partieDecla(lexical_analyser):
 	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
 		listeDeclaOp(lexical_analyser)
 	if not lexical_analyser.isKeyword("begin") :
-    		listeDeclaVar(lexical_analyser, 0)               
+    		listeDeclaVar(lexical_analyser, 0)
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -79,25 +79,25 @@ def procedure(lexical_analyser):
 	lexical_analyser.acceptKeyword("procedure")
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of procedure : "+ident)
-       
+
 	partieFormelle(lexical_analyser, ident)
 
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutProc(ident, numero_ligne()+2)
 
 	corpsProc(lexical_analyser)
-       
+
 
 def fonction(lexical_analyser):
 	lexical_analyser.acceptKeyword("function")
 	ident = lexical_analyser.acceptIdentifier()
 	logger.debug("Name of function : "+ident)
-	
+
 	partieFormelle(lexical_analyser, ident)
-	
+
 	lexical_analyser.acceptKeyword("return")
 	typ = nnpType(lexical_analyser)
-        
+
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutFonc(ident, numero_ligne()+2, typ)
 	corpsFonct(lexical_analyser)
@@ -142,7 +142,7 @@ def specif(lexical_analyser, compteurArg, nom):
 	lexical_analyser.acceptCharacter(":")
 	if lexical_analyser.isKeyword("in"):
 		mde = mode(lexical_analyser)
-                
+
 	typeVar = nnpType(lexical_analyser)
 	for i in range (len(liste)):
 		identifierTable.ajoutArg(liste[i], typeVar, mde, nom, compteurArg)
@@ -153,7 +153,7 @@ def mode(lexical_analyser):
 	if lexical_analyser.isKeyword("out"):
 		lexical_analyser.acceptKeyword("out")
 		logger.debug("in out parameter")
-		return ("in out")                
+		return ("in out")
 	else:
 		logger.debug("in parameter")
 		return ("in")
@@ -237,7 +237,7 @@ def instr(lexical_analyser):
 			lexical_analyser.acceptSymbol(":=")
 			typeElt = expression(lexical_analyser)
 			if(typeIdent != typeElt) :
-				msg = "Error : On ne peut affecter un element à une variable d'un type different."
+				msg = "Error : On ne peut affecter un element a une variable d'un type different."
 				logger.error(msg)
 				raise AnaSynException(msg)
 			code.write("affectation\n")
@@ -258,7 +258,7 @@ def instr(lexical_analyser):
 		else:
 			logger.error("Expecting procedure call or affectation!")
 			raise AnaSynException("Expecting procedure call or affectation!")
-		
+
 	else:
 		logger.error("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
 		raise AnaSynException("Unknown Instruction <"+ lexical_analyser.get_value() +">!")
@@ -276,13 +276,13 @@ def expression(lexical_analyser):
 	typeElt = exp1(lexical_analyser)
 	if lexical_analyser.isKeyword("or"):
 		# On doit avoir des booleens
-		if(typeElt != 'boolean') : 
+		if(typeElt != 'boolean') :
 			msg = "Error : On ne peut faire une instruction 'or' qu'avec des entiers."
 			logger.error(msg)
 			raise AnaSynException(msg)
 		lexical_analyser.acceptKeyword("or")
 		typeElt2 = exp1(lexical_analyser)
-		if(typeElt2 != 'boolean') : 
+		if(typeElt2 != 'boolean') :
 			msg = "Error : On ne peut faire une instruction 'or' qu'avec des entiers."
 			logger.error(msg)
 			raise AnaSynException(msg)
@@ -290,20 +290,20 @@ def expression(lexical_analyser):
 		# Si on a bien deux booleens, on aura une expression booleenne
 		typeElt = 'boolean'
 	return typeElt
-        
+
 def exp1(lexical_analyser):
 	logger.debug("parsing exp1")
-	
+
 	typeElt = exp2(lexical_analyser)
 	if lexical_analyser.isKeyword("and"):
 		# On doit avoir des booleens
-		if(typeElt != 'boolean') : 
+		if(typeElt != 'boolean') :
 			msg = "Error : On ne peut faire une instruction 'and' qu'avec des entiers."
 			logger.error(msg)
 			raise AnaSynException(msg)
 		lexical_analyser.acceptKeyword("and")
 		typeElt2 = exp2(lexical_analyser)
-		if(typeElt2 != 'boolean') : 
+		if(typeElt2 != 'boolean') :
 			msg = "Error : On ne peut faire une instruction 'and' qu'avec des entiers."
 			logger.error(msg)
 			raise AnaSynException(msg)
@@ -311,7 +311,7 @@ def exp1(lexical_analyser):
 		# S'il y a un and, on aura une expression booleenne
 		typeElt = 'boolean'
 	return typeElt
-        
+
 def exp2(lexical_analyser):
 	logger.debug("parsing exp2")
 	typeElt = exp3(lexical_analyser)
@@ -333,7 +333,7 @@ def exp2(lexical_analyser):
 		# Une comparaison renvoyant un booleen, notre element devient un booleen
 		typeElt = 'boolean'
 	elif lexical_analyser.isSymbol("=") or \
-		lexical_analyser.isSymbol("/="): 
+		lexical_analyser.isSymbol("/="):
 		op = opRel(lexical_analyser)
 		typeElt2 = exp3(lexical_analyser)
 		# Les deux elements doivent etre du meme type pour pouvoir comparer
@@ -345,34 +345,34 @@ def exp2(lexical_analyser):
 		# Une comparaison renvoyant un booleen, notre element devient un booleen
 		typeElt = 'boolean'
 	return typeElt
-	
+
 def opRel(lexical_analyser):
 	logger.debug("parsing relationnal operator: " + lexical_analyser.get_value())
-        
+
 	if	lexical_analyser.isSymbol("<"):
 		lexical_analyser.acceptSymbol("<")
 		return "inf\n"
-        
+
 	elif lexical_analyser.isSymbol("<="):
 		lexical_analyser.acceptSymbol("<=")
 		return "infeg\n"
-        
+
 	elif lexical_analyser.isSymbol(">"):
 		lexical_analyser.acceptSymbol(">")
 		return "sup\n"
-        
+
 	elif lexical_analyser.isSymbol(">="):
 		lexical_analyser.acceptSymbol(">=")
 		return "supeg\n"
-        
+
 	elif lexical_analyser.isSymbol("="):
 		lexical_analyser.acceptSymbol("=")
 		return "egal\n"
-        
+
 	elif lexical_analyser.isSymbol("/="):
 		lexical_analyser.acceptSymbol("/=")
 		return "diff\n"
-        
+
 	else:
 		msg = "Unknown relationnal operator <"+ lexical_analyser.get_value() +">!"
 		logger.error(msg)
@@ -380,7 +380,7 @@ def opRel(lexical_analyser):
 
 def exp3(lexical_analyser):
 	logger.debug("parsing exp3")
-	typeElt = exp4(lexical_analyser)	
+	typeElt = exp4(lexical_analyser)
 	if lexical_analyser.isCharacter("+") or lexical_analyser.isCharacter("-"):
 		if(typeElt != 'integer') : # On n'a pas un entier
 			msg = "Error : On ne peut faire des additions ou des soustractions qu'entre des entiers."
@@ -403,7 +403,7 @@ def opAdd(lexical_analyser):
 	elif lexical_analyser.isCharacter("-"):
 		lexical_analyser.acceptCharacter("-")
 		return("sous")
-                
+
 	else:
 		msg = "Unknown additive operator <"+ lexical_analyser.get_value() +">!"
 		logger.error(msg)
@@ -411,9 +411,9 @@ def opAdd(lexical_analyser):
 
 def exp4(lexical_analyser):
 	logger.debug("parsing exp4")
-        
-	typeElt = prim(lexical_analyser)	
-	if lexical_analyser.isCharacter("*") or lexical_analyser.isCharacter("/"): 
+
+	typeElt = prim(lexical_analyser)
+	if lexical_analyser.isCharacter("*") or lexical_analyser.isCharacter("/"):
 		# On ne peut faire les operations que sur des entiers
 		if (typeElt != 'integer'):
 			msg = "Error : On ne peut faire des multiplications ou des divisions qu'entre des entiers."
@@ -428,18 +428,18 @@ def exp4(lexical_analyser):
 				raise AnaSynException(msg)
 			code.write(str(op)+"\n")
 	return typeElt
-	
+
 
 def opMult(lexical_analyser):
 	logger.debug("parsing multiplicative operator: " + lexical_analyser.get_value())
 	if lexical_analyser.isCharacter("*"):
 		lexical_analyser.acceptCharacter("*")
 		return "mult"
-                
+
 	elif lexical_analyser.isCharacter("/"):
 		lexical_analyser.acceptCharacter("/")
 		return "div"
-                
+
 	else:
 		msg = "Unknown multiplicative operator <"+ lexical_analyser.get_value() +">!"
 		logger.error(msg)
@@ -460,15 +460,15 @@ def opUnaire(lexical_analyser):
 	if lexical_analyser.isCharacter("+"):
 		lexical_analyser.acceptCharacter("+")
 		return "plus\n"
-                
+
 	elif lexical_analyser.isCharacter("-"):
 		lexical_analyser.acceptCharacter("-")
 		return "moins\n"
-                
+
 	elif lexical_analyser.isKeyword("not"):
 		lexical_analyser.acceptKeyword("not")
 		return "non\n"
-                
+
 	else:
 		msg = "Unknown additive operator <"+ lexical_analyser.get_value() +">!"
 		logger.error(msg)
@@ -533,14 +533,14 @@ def valeur(lexical_analyser):
 def valBool(lexical_analyser):
 	if lexical_analyser.isKeyword("true"):
 		lexical_analyser.acceptKeyword("true")
-		code.write("empiler(1)\n")	
+		code.write("empiler(1)\n")
 		logger.debug("boolean true value")
-                
+
 	else:
 		logger.debug("boolean false value")
 		lexical_analyser.acceptKeyword("false")
-		code.write("empiler(0)\n")	
-        
+		code.write("empiler(0)\n")
+
 	return "boolean"
 
 def es(lexical_analyser):
@@ -556,7 +556,7 @@ def es(lexical_analyser):
 			code.write("get\n")
 			logger.debug("Call to get "+ident)
 		else :
-			msg = "Error : On ne peut pas appliquer l'instruction get à un booléen."
+			msg = "Error : On ne peut pas appliquer l'instruction get a un booleen."
 			logger.error(msg)
 			raise AnaSynException(msg)
 	elif lexical_analyser.isKeyword("put"):
@@ -564,8 +564,8 @@ def es(lexical_analyser):
 		lexical_analyser.acceptCharacter("(")
 		typeElt = expression(lexical_analyser)
 		lexical_analyser.acceptCharacter(")")
-		if(typeElt == 'boolean') : 
-			msg = "Error : On ne peut pas appliquer l'instruction put à un booléen."
+		if(typeElt == 'boolean') :
+			msg = "Error : On ne peut pas appliquer l'instruction put a un booleen."
 			logger.error(msg)
 			raise AnaSynException(msg)
 		code.write("put\n")
@@ -593,7 +593,7 @@ def boucle(lexical_analyser):
 
 	code.write("tra("+str(lieu_debut)+")\n")
 	lieu_fin = numero_ligne()+1
-	
+
 	modif_ligne(lieu_tze, "tze("+str(lieu_fin)+")")
 
 	lexical_analyser.acceptKeyword("end")
@@ -623,7 +623,7 @@ def altern(lexical_analyser):
 		lieu_tra = numero_ligne()
 		modif_ligne(lieu_tze, "tze("+str(lieu_tra+1)+")")
 		suiteInstr(lexical_analyser)
-       
+
 	lexical_analyser.acceptKeyword("end")
 
 	lieu_end = numero_ligne()+1
@@ -666,11 +666,11 @@ def modif_ligne(ligne, texte):
 
 
 
-	
 
-########################################################################				 	
+
+########################################################################
 def main():
- 	
+
 	parser = argparse.ArgumentParser(description='Do the syntactical analysis of a NNP program.')
 	parser.add_argument('inputfile', type=str, nargs=1, help='name of the input source file')
 	parser.add_argument('-o', '--outputfile', dest='outputfile', action='store', \
@@ -692,10 +692,10 @@ def main():
 	except:
 		print("Error: can\'t open input file!")
 		return
-		
+
 	outputFilename = args.outputfile
-	
-  	# create logger      
+
+  	# create logger
 	LOGGING_LEVEL = args.debug
 	logger.setLevel(LOGGING_LEVEL)
 	ch = logging.StreamHandler()
@@ -710,19 +710,19 @@ def main():
 		False#
 
 	lexical_analyser = analex.LexicalAnalyser()
-	
+
 	lineIndex = 0
 	for line in f:
 		line = line.rstrip('\r\n')
 		lexical_analyser.analyse_line(lineIndex, line)
 		lineIndex = lineIndex + 1
 	f.close()
-	
+
 
 	# launch the analysis of the program
 	lexical_analyser.init_analyser()
 	program(lexical_analyser)
-		
+
 	if args.show_ident_table:
 			print("------ IDENTIFIER TABLE ------")
 			print(str(identifierTable.afficherTable()))
@@ -743,9 +743,9 @@ def main():
 	#while instrIndex < codeGenerator.get_instruction_counter():
 	#        output_file.write("%s\n" % str(codeGenerator.get_instruction_at_index(instrIndex)))
 	#        instrIndex += 1
-		
+
 	if outputFilename != "":
-			output_file.close() 
+			output_file.close()
 
 	code.close()
 
@@ -756,7 +756,7 @@ code.truncate(0)
 compteur =0
 liste = []
 identifierTable = tdi()
-			 
+
 
 if __name__ == "__main__":
-    main() 
+    main()
