@@ -1,0 +1,26 @@
+
+debutProg
+tra(21)
+empilerAd(1)
+valeurPile
+empiler(0)
+egal
+tze(11)
+empiler(1)
+retourFonc
+tra(21)
+empilerAd(1)
+valeurPile
+reserverBloc
+empilerAd(1)
+valeurPile
+empiler(1)
+sous
+traStat(0, 1)
+mult
+retourFonc
+reserverBloc
+empiler(3)
+traStat(0, 1)
+put
+finProg
