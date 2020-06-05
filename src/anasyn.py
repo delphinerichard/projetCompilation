@@ -61,7 +61,7 @@ def partieDecla(lexical_analyser):
 	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
 		listeDeclaOp(lexical_analyser)
 	if not lexical_analyser.isKeyword("begin") :
-    		listeDeclaVar(lexical_analyser, 0)               
+    		listeDeclaVar(lexical_analyser, 0, "main")               
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -85,7 +85,7 @@ def procedure(lexical_analyser):
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutProc(ident, numero_ligne()+2)
 
-	corpsProc(lexical_analyser)
+	corpsProc(lexical_analyser, ident)
        
 
 def fonction(lexical_analyser):
@@ -100,24 +100,24 @@ def fonction(lexical_analyser):
         
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutFonc(ident, numero_ligne()+2, typ)
-	corpsFonct(lexical_analyser)
+	corpsFonct(lexical_analyser, ident)
 
 
 
-def corpsProc(lexical_analyser):
-	if not lexical_analyser.isKeyword("begin"):
-		partieDeclaProc(lexical_analyser)
-	lexical_analyser.acceptKeyword("begin")
+def corpsProc(lexical_analyser, nom):
 	code.write("tra\n")
 	lieu_tra = numero_ligne()
+	if not lexical_analyser.isKeyword("begin"):
+		partieDeclaProc(lexical_analyser, nom)
+	lexical_analyser.acceptKeyword("begin")
 	suiteInstr(lexical_analyser)
 	code.write("retourProc\n")
 	modif_ligne(lieu_tra, "tra("+str(numero_ligne()+1)+")")
 	lexical_analyser.acceptKeyword("end")
 
-def corpsFonct(lexical_analyser):
+def corpsFonct(lexical_analyser, nom):
 	if not lexical_analyser.isKeyword("begin"):
-		partieDeclaProc(lexical_analyser)
+		partieDeclaProc(lexical_analyser, nom)
 	lexical_analyser.acceptKeyword("begin")
 	code.write("tra\n")
 	lieu_tra = numero_ligne()
@@ -173,22 +173,25 @@ def nnpType(lexical_analyser):
 		raise AnaSynException("Unknown type found <"+ lexical_analyser.get_value() +">!")
 	return typeVar
 
-def partieDeclaProc(lexical_analyser):
-	listeDeclaVar(lexical_analyser, 0)
+def partieDeclaProc(lexical_analyser, nom):
+	listeDeclaVar(lexical_analyser, 0, nom)
 
-def listeDeclaVar(lexical_analyser, compteurVar):
-	declaVar(lexical_analyser, compteurVar)
+def listeDeclaVar(lexical_analyser, compteurVar, nom):
+	declaVar(lexical_analyser, compteurVar, nom)
 	if lexical_analyser.isIdentifier():
-		listeDeclaVar(lexical_analyser, compteurVar+1)
+		listeDeclaVar(lexical_analyser, compteurVar+1, nom)
 
-def declaVar(lexical_analyser, compteurVar):
+def declaVar(lexical_analyser, compteurVar, nom):
 	listeIdent(lexical_analyser, [])
 	code.write("reserver("+str(compteur+1)+")\n")
 	lexical_analyser.acceptCharacter(":")
 	logger.debug("now parsing type...")
 	typeVar = nnpType(lexical_analyser)
 	for i in range(len(liste)):
-		identifierTable.ajoutVar(liste[i], typeVar, "main", i+compteurVar)
+		if(nom != "main" ):
+			identifierTable.ajoutArg(liste[i], typeVar, "in", nom, i+compteurVar)
+		else:
+			identifierTable.ajoutVar(liste[i], typeVar, "main", i+compteurVar)
 	lexical_analyser.acceptCharacter(";")
 
 def listeIdent(lexical_analyser, listeident):
