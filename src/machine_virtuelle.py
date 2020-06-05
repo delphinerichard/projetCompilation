@@ -82,7 +82,7 @@ def debutProg(i):
 
 		# Entree et sortie du programme
 		elif("put" == lignes[i]):
-			print(put())
+			print("Sortie : "+str(put()))
 			i += 1
 		elif("get" == lignes[i]):
 			get()
@@ -174,7 +174,6 @@ def div():
 	nb2 = pile[int(len(pile)-1)]
 	depiler_pile(pile)
 	nb3 = nb2/nb1
-	print(nb1, nb2, nb3)
 	empiler_pile(pile, nb3)
 
 def sous():
@@ -230,7 +229,10 @@ def put():
 
 def get():
 	empiler_pile(pile, int(input("Tapez une entree puis appuyez sur entree\n")))
+<<<<<<< HEAD
 	print(pile)
+=======
+>>>>>>> 789e1f29c2bc838a5ed5d007e8e86749936ac9d5
 	affectation()
 
 def empiler_pile(pile,x):
@@ -248,7 +250,7 @@ def main():
 
 	program(1)
 
-	print (pile)
+	print ("pile = "+str(pile))
 			
 
 ########################################################################
