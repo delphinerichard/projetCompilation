@@ -243,10 +243,12 @@ def instr(lexical_analyser):
 			lexical_analyser.acceptCharacter("(")
 
 			code.write("reserverBloc\n")
-			compteurArg =1
+			compteurArg = 1
 			if not lexical_analyser.isCharacter(")"):
 				listePe(lexical_analyser)
 				compteurArg +=1
+			else:
+				compteurArg =0
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")
