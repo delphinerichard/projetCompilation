@@ -12,5 +12,5 @@ procedure pp is
     end
   end;
 begin
-  put(fa(3))
+  put(fa(1000))
 end.
