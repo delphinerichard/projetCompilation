@@ -159,12 +159,18 @@ def listeDeclaVar(lexical_analyser):
 		listeDeclaVar(lexical_analyser)
 
 def declaVar(lexical_analyser):
-	listeIdent(lexical_analyser)
+	liste = listeIdent(lexical_analyser)
 	code.write("reserver("+str(compteur+1)+")\n")
 	lexical_analyser.acceptCharacter(":")
 	logger.debug("now parsing type...")
-	nnpType(lexical_analyser)
-	lexical_analyser.acceptCharacter(";")
+	typeVar = nnpType(lexical_analyser)
+	if (typeVar == ""):
+		print("Error : Une variable doit avoir un type a sa declaration.\n")
+		errors = True
+	else :
+		for i in liste:
+			identifierTable.ajoutvar(i, typeVar, "", "")
+		lexical_analyser.acceptCharacter(";")
 
 def listeIdent(lexical_analyser):
 	global compteur
@@ -191,7 +197,6 @@ def instr(lexical_analyser):
 	if lexical_analyser.isKeyword("while"):
 		boucle(lexical_analyser)
 	elif lexical_analyser.isKeyword("if"):
-		print(lexical_analyser)
 		altern(lexical_analyser)
 	elif lexical_analyser.isKeyword("get") or lexical_analyser.isKeyword("put"):
 		es(lexical_analyser)
@@ -472,8 +477,13 @@ def altern(lexical_analyser):
 	sinon = False
 	logger.debug("parsing if: ")
 	lexical_analyser.acceptKeyword("if")
+#	tmp = lexical_analyser
+#	if(testcondition(tmp) == True) :
 	expression(lexical_analyser)
 	code.write("tze\n")
+#	else :
+#		print("Error : Une condition est obligatoirement un booleen !\n")
+#		errors = True
 
 	lieu_tze = numero_ligne()
 
@@ -496,6 +506,14 @@ def altern(lexical_analyser):
 	else:
 		modif_ligne(lieu_tze, "tze("+str(lieu_end)+")")
 	logger.debug("end of if")
+
+#def testcondition(tmp) :
+#	# On teste si ce qu'il y a avant le then est un booleen
+#	if (tmp.isInteger()) :
+#		return False
+#	else :
+#		print("c'est pas sensé être ça")
+#		return True
 
 def retour(lexical_analyser):
 	logger.debug("parsing return instruction")
@@ -583,30 +601,34 @@ def main():
 	# launch the analysis of the program
 	lexical_analyser.init_analyser()
 	program(lexical_analyser)
-		
-	if args.show_ident_table:
-			print("------ IDENTIFIER TABLE ------")
-			print(str(identifierTable))
-			print("------ END OF IDENTIFIER TABLE ------")
+
+	if (errors == True) :
+		print("Il y a eu des erreurs dans le code\n")	
+
+	else :
+		if args.show_ident_table:
+				print("------ IDENTIFIER TABLE ------")
+				print(str(identifierTable))
+				print("------ END OF IDENTIFIER TABLE ------")
 
 
-	if outputFilename != "":
-			try:
-					output_file = open(outputFilename, 'w')
-			except:
-					print("Error: can\'t open output file!")
-					return
-	else:
-			output_file = sys.stdout
+		if outputFilename != "":
+				try:
+						output_file = open(outputFilename, 'w')
+				except:
+						print("Error: can\'t open output file!")
+						return
+		else:
+				output_file = sys.stdout
 
-	# Outputs the generated code to a file
-	#instrIndex = 0
-	#while instrIndex < codeGenerator.get_instruction_counter():
-	#        output_file.write("%s\n" % str(codeGenerator.get_instruction_at_index(instrIndex)))
-	#        instrIndex += 1
-		
-	if outputFilename != "":
-			output_file.close() 
+		# Outputs the generated code to a file
+		#instrIndex = 0
+		#while instrIndex < codeGenerator.get_instruction_counter():
+		#        output_file.write("%s\n" % str(codeGenerator.get_instruction_at_index(instrIndex)))
+		#        instrIndex += 1
+			
+		if outputFilename != "":
+				output_file.close() 
 
 	code.close()
 
@@ -616,6 +638,8 @@ code.truncate(0)
 compteur = 0
 identifierTable = []
 #identifierTable = tdi() # On utilise notre propre TDI (voir fichier tdi.py)
+
+errors = False
 			 
 
 if __name__ == "__main__":

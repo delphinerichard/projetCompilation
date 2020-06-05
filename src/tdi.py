@@ -60,5 +60,4 @@ class tdi:
         if(len(self.table) > addr):
             raise Exception("Il n'y a pas de variable à l'adresse {}".format(addr))
         else :
-            return self.table[addr]["type"
-]
+            return self.table[addr]["type"]
