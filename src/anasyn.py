@@ -61,7 +61,7 @@ def partieDecla(lexical_analyser):
 	if lexical_analyser.isKeyword("procedure") or lexical_analyser.isKeyword("function") :
 		listeDeclaOp(lexical_analyser)
 	if not lexical_analyser.isKeyword("begin") :
-    		listeDeclaVar(lexical_analyser, 0)
+    		listeDeclaVar(lexical_analyser, 0, "main")               
 
 def listeDeclaOp(lexical_analyser):
 	declaOp(lexical_analyser)
@@ -85,7 +85,8 @@ def procedure(lexical_analyser):
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutProc(ident, numero_ligne()+2)
 
-	corpsProc(lexical_analyser)
+	corpsProc(lexical_analyser, ident)
+       
 
 
 def fonction(lexical_analyser):
@@ -100,24 +101,24 @@ def fonction(lexical_analyser):
 
 	lexical_analyser.acceptKeyword("is")
 	identifierTable.ajoutFonc(ident, numero_ligne()+2, typ)
-	corpsFonct(lexical_analyser)
+	corpsFonct(lexical_analyser, ident)
 
 
 
-def corpsProc(lexical_analyser):
-	if not lexical_analyser.isKeyword("begin"):
-		partieDeclaProc(lexical_analyser)
-	lexical_analyser.acceptKeyword("begin")
+def corpsProc(lexical_analyser, nom):
 	code.write("tra\n")
 	lieu_tra = numero_ligne()
+	if not lexical_analyser.isKeyword("begin"):
+		partieDeclaProc(lexical_analyser, nom)
+	lexical_analyser.acceptKeyword("begin")
 	suiteInstr(lexical_analyser)
 	code.write("retourProc\n")
 	modif_ligne(lieu_tra, "tra("+str(numero_ligne()+1)+")")
 	lexical_analyser.acceptKeyword("end")
 
-def corpsFonct(lexical_analyser):
+def corpsFonct(lexical_analyser, nom):
 	if not lexical_analyser.isKeyword("begin"):
-		partieDeclaProc(lexical_analyser)
+		partieDeclaProc(lexical_analyser, nom)
 	lexical_analyser.acceptKeyword("begin")
 	code.write("tra\n")
 	lieu_tra = numero_ligne()
@@ -138,7 +139,7 @@ def listeSpecifFormelles(lexical_analyser, compteurArg, nom):
 		listeSpecifFormelles(lexical_analyser, compteurArg+1, nom)
 
 def specif(lexical_analyser, compteurArg, nom):
-	listeIdent(lexical_analyser, [])
+	listeIdent(lexical_analyser, [], 0)
 	lexical_analyser.acceptCharacter(":")
 	if lexical_analyser.isKeyword("in"):
 		mde = mode(lexical_analyser)
@@ -174,35 +175,38 @@ def nnpType(lexical_analyser):
 		raise AnaSynException(msg)
 	return typeVar
 
-def partieDeclaProc(lexical_analyser):
-	listeDeclaVar(lexical_analyser, 0)
+def partieDeclaProc(lexical_analyser, nom):
+	listeDeclaVar(lexical_analyser, 0, nom)
 
-def listeDeclaVar(lexical_analyser, compteurVar):
-	declaVar(lexical_analyser, compteurVar)
+def listeDeclaVar(lexical_analyser, compteurVar, nom):
+	declaVar(lexical_analyser, compteurVar, nom)
 	if lexical_analyser.isIdentifier():
-		listeDeclaVar(lexical_analyser, compteurVar+1)
+		listeDeclaVar(lexical_analyser, compteurVar+1, nom)
 
-def declaVar(lexical_analyser, compteurVar):
-	listeIdent(lexical_analyser, [])
+def declaVar(lexical_analyser, compteurVar, nom):
+	listeIdent(lexical_analyser, [], 0)
 	code.write("reserver("+str(compteur+1)+")\n")
 	lexical_analyser.acceptCharacter(":")
 	logger.debug("now parsing type...")
 	typeVar = nnpType(lexical_analyser)
 	for i in range(len(liste)):
-		identifierTable.ajoutVar(liste[i], typeVar, "main", i+compteurVar)
+		if(nom != "main" ):
+			identifierTable.ajoutArg(liste[i], typeVar, "in", nom, i+compteurVar)
+		else:
+			identifierTable.ajoutVar(liste[i], typeVar, "main", i+compteurVar)
 	lexical_analyser.acceptCharacter(";")
 
-def listeIdent(lexical_analyser, listeident):
+def listeIdent(lexical_analyser, listeident, cpt):
 	global compteur
 	global liste
 	ident = lexical_analyser.acceptIdentifier()
 	listeident.append(ident)
 	liste = listeident
+	compteur = cpt
 	logger.debug("identifier found: "+str(ident))
 	if lexical_analyser.isCharacter(","):
-		compteur += 1
 		lexical_analyser.acceptCharacter(",")
-		listeIdent(lexical_analyser, listeident)
+		listeIdent(lexical_analyser, listeident, cpt + 1)
 
 def suiteInstrNonVide(lexical_analyser):
 	instr(lexical_analyser)
@@ -246,10 +250,12 @@ def instr(lexical_analyser):
 			lexical_analyser.acceptCharacter("(")
 
 			code.write("reserverBloc\n")
-			compteurArg =1
+			compteurArg = 1
 			if not lexical_analyser.isCharacter(")"):
 				listePe(lexical_analyser)
 				compteurArg +=1
+			else:
+				compteurArg =0
 
 			lexical_analyser.acceptCharacter(")")
 			logger.debug("parsed procedure call")

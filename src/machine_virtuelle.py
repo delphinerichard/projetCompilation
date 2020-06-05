@@ -10,7 +10,6 @@ def debutProg(i):
 	base = 0
 	nbParam = 0
 	while (not("finProg" in lignes[i])):
-		print(pile, i+1)
 		# Reserve de la place pour les variables et fonctions
 		if ("reserver(" in lignes[i]):
 			reserver(retrouver_parametres(lignes[i])[0])
@@ -123,6 +122,18 @@ def debutProg(i):
 				nbParam = pile[base-2]
 			depiler_pile()
 			empiler_pile(tmp)
+		elif("retourProc" in lignes[i]):
+			while(len(pile)>base):
+				depiler_pile()
+			i = pile[len(pile)-1]
+			depiler_pile()
+			base = pile[len(pile)-2]
+			depiler_pile()
+			if(base==0):
+				nbParam = 0
+			else:
+				nbParam = pile[base-2]
+			depiler_pile()
 
 		# Erreurs
 		else:
