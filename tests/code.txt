@@ -1,6 +1,0 @@
-
-debutProg
-reserver(1)
-empiler(0)
-get
-finProg
